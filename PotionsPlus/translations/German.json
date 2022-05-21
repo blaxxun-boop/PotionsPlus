@@ -33,6 +33,8 @@
   "pp_hellbroth_of_flames_description": "Kann auf deine Feinde geworfen werden, um ihnen {power} Feuerschaden zuzufügen, solange wie sie sich in der Explosion befinden. Nur für verrückte Alchemisten empfohlen.",
   "pp_hellbroth_of_frost": "Teufelsgebräu des Frostes",
   "pp_hellbroth_of_frost_description": "Kann auf deine Feinde geworfen werden, um ihnen {power} Frostschaden zuzufügen, solange wie sie sich in der Explosion befinden.",
+  "pp_hellbroth_of_thors_fury": "Teufelsgebräu des Thors Zorn",
+  "pp_hellbroth_of_thors_fury_description": "Kann auf deine Feinde geworfen werden, um ihnen einen Stromschlag mit {power} Blitzschaden zuzufügen.",
   "pp_hellbroth_of_eternal_life": "Teufelsgebräu des ewigen Lebens",
   "pp_hellbroth_of_eternal_life_description": "Statt auf deine Feinde, kannst du dieses Teufelsgebräu auf deine Freunde werfen, um sie zu heilen. Heilt {power}% der maximalen Lebenspunkte, solange man sich in der Wolke befindet.",
   "pp_lesser_group_healing": "Gebräu der verblassenden Gruppenheilung",

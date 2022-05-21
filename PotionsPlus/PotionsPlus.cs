@@ -21,7 +21,7 @@ namespace PotionsPlus;
 public class PotionsPlus : BaseUnityPlugin
 {
 	private const string ModName = "PotionsPlus";
-	private const string ModVersion = "4.0.0";
+	private const string ModVersion = "4.0.1";
 	private const string ModGUID = "com.odinplus.potionsplus";
 
 	private static readonly ConfigSync configSync = new(ModName) { DisplayName = ModName, CurrentVersion = ModVersion, MinimumRequiredVersion = ModVersion };
@@ -93,6 +93,8 @@ public class PotionsPlus : BaseUnityPlugin
 	private static ConfigEntry<float> hellbrothOfFlamesDamage = null!;
 	// Hellbroth of Frost
 	private static ConfigEntry<float> hellbrothOfFrostDamage = null!;
+	// Hellbroth of Thors Fury
+	private static ConfigEntry<float> hellbrothOfThorsFuryDamage = null!;
 	// Hellbroth of Eternal Life
 	private static ConfigEntry<float> hellbrothOfEternalLifeHealing = null!;
 	// Brew of Faint Group Healing
@@ -222,6 +224,8 @@ public class PotionsPlus : BaseUnityPlugin
 		hellbrothOfFlamesDamage = config("Hellbroth of Flames", "Fire Damage", 20f, new ConfigDescription("Fire damage dealt per tick by the Hellbroth of Flames."));
 		// Hellbroth of Frost
 		hellbrothOfFrostDamage = config("Hellbroth of Frost", "Frost Damage", 50f, new ConfigDescription("Frost damage dealt per tick by the Hellbroth of Frost."));
+		// Hellbroth of Thors Fury
+		hellbrothOfThorsFuryDamage = config("Hellbroth of Thors Fury", "Lightning Damage", 60f, new ConfigDescription("Lightning damage dealt per tick by the Hellbroth of Thors Fury."));
 		// Hellbroth of Eternal Life
 		hellbrothOfEternalLifeHealing = config("Hellbroth of Eternal Life", "Healing", 20f, new ConfigDescription("Percentage of maximum health as healing per tick by the Hellbroth of Eternal Life.", new AcceptableValueRange<float>(0.1f, 100f)));
 		// Brew of Faint Group Healing
@@ -271,6 +275,7 @@ public class PotionsPlus : BaseUnityPlugin
 		LocalizationManager.LocalizationManager.AddPlaceholder("pp_vial_stam_description", "power", lesserStaminaVialStaminaOverTime);
 		LocalizationManager.LocalizationManager.AddPlaceholder("pp_hellbroth_of_flames_description", "power", hellbrothOfFlamesDamage);
 		LocalizationManager.LocalizationManager.AddPlaceholder("pp_hellbroth_of_frost_description", "power", hellbrothOfFrostDamage);
+		LocalizationManager.LocalizationManager.AddPlaceholder("pp_hellbroth_of_thors_fury", "power", hellbrothOfThorsFuryDamage);
 		LocalizationManager.LocalizationManager.AddPlaceholder("pp_hellbroth_of_eternal_life_description", "power", hellbrothOfEternalLifeHealing);
 		LocalizationManager.LocalizationManager.AddPlaceholder("pp_lesser_group_healing_description", "power", brewOfFaintGroupHealingHealthOverTime);
 		LocalizationManager.LocalizationManager.AddPlaceholder("pp_lesser_group_healing_description", "range", brewOfFaintGroupHealingRange);
@@ -496,11 +501,22 @@ public class PotionsPlus : BaseUnityPlugin
 		potion.Crafting.Add("opalchemy", 1);
 		potion.RequiredItems.Add("FreezeGland", 4);
 		potion.RequiredItems.Add("Chain", 1);
-		
+
 		aoe = PrefabManager.RegisterPrefab(assets, "Hellbroth_Frost_Explosion").GetComponent<Aoe>();
 		aoe.m_damage.m_frost = hellbrothOfFrostDamage.Value;
 		hellbrothOfFrostDamage.SettingChanged += (_, _) => aoe.m_damage.m_frost = hellbrothOfFrostDamage.Value;
 		PrefabManager.RegisterPrefab(assets, "Hellbroth_Frost_Projectile");
+
+		potion = new Item(assets, "Hellbroth_of_Thors_Fury");
+		potion.Crafting.Add("opalchemy", 1);
+		potion.RequiredItems.Add("Tar", 6);
+		potion.RequiredItems.Add("Thunderstone", 1);
+
+		aoe = PrefabManager.RegisterPrefab(assets, "Hellbroth_Thors_Fury_Explosion").GetComponent<Aoe>();
+		aoe.m_damage.m_lightning = hellbrothOfThorsFuryDamage.Value;
+		hellbrothOfThorsFuryDamage.SettingChanged += (_, _) => aoe.m_damage.m_lightning = hellbrothOfThorsFuryDamage.Value;
+		PrefabManager.RegisterPrefab(assets, "Hellbroth_Thors_Fury_Projectile");
+
 
 		potion = new Item(assets, "Hellbroth_of_Eternal_Life");
 		potion.Crafting.Add("opalchemy", 1);

@@ -64,5 +64,7 @@
   "pp_potion_skill_description": "En blandning av kemi och spekulativ filosofi som ämnar att upptäcka elixirer samt metoder att transmutera många vanligare metaller till guld.",
   "pp_se_cheatdeath": "Lura Döden",
   "pp_se_cheatdeath_desc": "Stenarnas kraft har fört dig tillbaka.",
-  "pp_se_cheatdeath_msg_start": "Stenen splittras och dess aska försvinner i vinden."
+  "pp_se_cheatdeath_msg_start": "Stenen splittras och dess aska försvinner i vinden.",
+  "pp_hellbroth_of_thors_fury": "Hellbroth från Thors Fury",
+  "pp_hellbroth_of_thors_fury_description": "Kan kastas mot dina fiender för att ge {power} blixtskador."
 }

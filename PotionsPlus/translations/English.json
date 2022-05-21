@@ -33,6 +33,8 @@
   "pp_hellbroth_of_flames_description": "Can be thrown at your enemies, to make them burn for {power} fire damage. Recommended for mad Alchemists only.",
   "pp_hellbroth_of_frost": "Hellbroth of Frost",
   "pp_hellbroth_of_frost_description": "Can be thrown at your enemies, to make them freeze for {power} frost damage.",
+  "pp_hellbroth_of_thors_fury": "Hellbroth of Thors Fury",
+  "pp_hellbroth_of_thors_fury_description": "Can be thrown at your enemies, to electrocute for {power} lightning damage.",
   "pp_hellbroth_of_eternal_life": "Hellbroth of Eternal Life",
   "pp_hellbroth_of_eternal_life_description": "Can be thrown to create a healing cloud. Heals all players inside for {power}% Health with each tick.",
   "pp_lesser_group_healing": "Brew of Faint Group Healing",
