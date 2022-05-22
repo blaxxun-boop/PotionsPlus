@@ -55,6 +55,8 @@
   "pp_brew_of_thunderous_words_description": "Imbues all group members within {range}m with thunder, causing them to deal pure lightning damage with each attack.",
   "pp_alchemy_table": "Zoe's Alchemy Table",
   "pp_alchemy_table_description": "Alchemy Table for Potions",
+  "pp_alchemy_book": "Upgrade for Alchemy Table",
+  "pp_alchemy_book_description": "Increase alchemy crafting knowledge",
   "pp_philstone_black": "Onyx Philosopher's Stone",
   "pp_philstone_black_description": "A mysterious stone of unknown powers, the very life force of the gods fill this rock.",
   "pp_se_black": "Prismatic Ward",

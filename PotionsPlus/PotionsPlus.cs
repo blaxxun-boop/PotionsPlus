@@ -21,7 +21,7 @@ namespace PotionsPlus;
 public class PotionsPlus : BaseUnityPlugin
 {
 	private const string ModName = "PotionsPlus";
-	private const string ModVersion = "4.0.1";
+	private const string ModVersion = "4.0.2";
 	private const string ModGUID = "com.odinplus.potionsplus";
 
 	private static readonly ConfigSync configSync = new(ModName) { DisplayName = ModName, CurrentVersion = ModVersion, MinimumRequiredVersion = ModVersion };
@@ -316,7 +316,7 @@ public class PotionsPlus : BaseUnityPlugin
 		}
 
 		Item potion = new(assets, "Potion_Meadbase");
-		potion.Crafting.Add("opalchemy", 1);
+		potion.Crafting.Add("opalchemy", 2);
 		potion.RequiredItems.Add("Honey", 2);
 		potion.RequiredItems.Add("YmirRemains", 4);
 
@@ -330,7 +330,7 @@ public class PotionsPlus : BaseUnityPlugin
 		SEValue(potion, (effect, value) => effect.m_ttl = value, flaskOfElementsTTL);
 
 		potion = new Item(assets, "Flask_of_Fortification");
-		potion.Crafting.Add("opalchemy", 1);
+		potion.Crafting.Add("opalchemy", 2);
 		potion.RequiredItems.Add("Potion_Meadbase", 1);
 		potion.RequiredItems.Add("Obsidian", 2);
 		potion.RequiredItems.Add("Flint", 4);
@@ -339,7 +339,7 @@ public class PotionsPlus : BaseUnityPlugin
 		SEValue(potion, (effect, value) => effect.m_ttl = value, flaskOfFortificationTTL);
 
 		potion = new Item(assets, "Flask_of_the_Gods");
-		potion.Crafting.Add("opalchemy", 1);
+		potion.Crafting.Add("opalchemy", 2);
 		potion.RequiredItems.Add("Potion_Meadbase", 1);
 		potion.RequiredItems.Add("Thistle", 4);
 		potion.RequiredItems.Add("Flax", 4);
@@ -350,7 +350,7 @@ public class PotionsPlus : BaseUnityPlugin
 		SEValue(potion, (effect, value) => effect.m_healthRegenMultiplier = value, flaskOfGodsRegenMultiplier);
 
 		potion = new Item(assets, "Flask_of_Magelight");
-		potion.Crafting.Add("opalchemy", 1);
+		potion.Crafting.Add("opalchemy", 2);
 		potion.RequiredItems.Add("Potion_Meadbase", 1);
 		potion.RequiredItems.Add("BoneFragments", 4);
 		potion.RequiredItems.Add("FreezeGland", 4);
@@ -368,7 +368,7 @@ public class PotionsPlus : BaseUnityPlugin
 		flaskOfMagelightColor.SettingChanged += (_, _) => SetLightIntensity();
 
 		potion = new Item(assets, "Flask_of_Second_Wind");
-		potion.Crafting.Add("opalchemy", 1);
+		potion.Crafting.Add("opalchemy", 2);
 		potion.RequiredItems.Add("Potion_Meadbase", 1);
 		potion.RequiredItems.Add("Ooze", 4);
 		potion.RequiredItems.Add("FreezeGland", 2);
@@ -380,7 +380,7 @@ public class PotionsPlus : BaseUnityPlugin
 		SEValue(potion, (effect, value) => effect.m_staminaRegenMultiplier = value, flaskOfSecondWindStaminaRegenMultiplier);
 
 		potion = new Item(assets, "Grand_Healing_Tide_Potion");
-		potion.Crafting.Add("opalchemy", 1);
+		potion.Crafting.Add("opalchemy", 2);
 		potion.RequiredItems.Add("Ooze", 2);
 		potion.RequiredItems.Add("Barley", 4);
 		potion.RequiredItems.Add("Needle", 2);
@@ -391,7 +391,7 @@ public class PotionsPlus : BaseUnityPlugin
 		SEValue(potion, (effect, value) => effect.m_healthOverTimeInterval = value, grandHealingTidePotionTickInterval);
 
 		potion = new Item(assets, "Grand_Spiritual_Healing_Potion");
-		potion.Crafting.Add("opalchemy", 1);
+		potion.Crafting.Add("opalchemy", 2);
 		potion.RequiredItems.Add("Ooze", 4);
 		potion.RequiredItems.Add("Flax", 4);
 		potion.RequiredItems.Add("WolfFang", 2);
@@ -401,7 +401,7 @@ public class PotionsPlus : BaseUnityPlugin
 		SEValue(potion, (effect, value) => effect.m_healthOverTime = value, grandSpiritualHealingPotionHealthOverTime);
 
 		potion = new Item(assets, "Grand_Stamina_Elixir");
-		potion.Crafting.Add("opalchemy", 1);
+		potion.Crafting.Add("opalchemy", 2);
 		potion.RequiredItems.Add("LoxMeat", 2);
 		potion.RequiredItems.Add("Carrot", 4);
 		potion.RequiredItems.Add("Turnip", 4);
@@ -412,7 +412,7 @@ public class PotionsPlus : BaseUnityPlugin
 		SEValue(potion, (effect, value) => effect.m_staminaOverTimeDuration = value, grandStaminaElixirTTL);
 
 		potion = new Item(assets, "Grand_Stealth_Elixir");
-		potion.Crafting.Add("opalchemy", 1);
+		potion.Crafting.Add("opalchemy", 2);
 		potion.RequiredItems.Add("FreezeGland", 2);
 		potion.RequiredItems.Add("Flax", 4);
 		potion.RequiredItems.Add("Feathers", 2);
@@ -487,6 +487,26 @@ public class PotionsPlus : BaseUnityPlugin
 		piece = new BuildPiece(assets, "opcauldron");
 		piece.RequiredItems.Add("Iron", 4, true);
 
+		piece = new BuildPiece(assets, "Odins_Alchemy_Book");
+		piece.RequiredItems.Add("WitheredBone", 1, true);
+		piece.RequiredItems.Add("SurtlingCore", 2, true);
+		piece.RequiredItems.Add("Iron", 4, true);
+
+		Item alchemystuff = new Item(assets, "Odins_Alchemy_Wand");
+		alchemystuff.Crafting.Add("opalchemy", 2);
+		alchemystuff.RequiredItems.Add("FineWood", 8);
+		alchemystuff.RequiredItems.Add("SurtlingCore", 1);
+
+		alchemystuff = new Item(assets, "Odins_Wizard_Hat");
+		alchemystuff.Crafting.Add("opalchemy", 2);
+		alchemystuff.RequiredItems.Add("LinenThread", 8);
+		alchemystuff.RequiredItems.Add("SurtlingCore", 1);
+
+		potion = new Item(assets, "Odins_Weapon_Oil");
+		potion.Crafting.Add("opalchemy", 1);
+		potion.RequiredItems.Add("Tar", 8);
+		potion.RequiredItems.Add("Crystal", 1);
+
 		potion = new Item(assets, "Hellbroth_of_Flames");
 		potion.Crafting.Add("opalchemy", 1);
 		potion.RequiredItems.Add("Resin", 8);
@@ -498,7 +518,7 @@ public class PotionsPlus : BaseUnityPlugin
 		PrefabManager.RegisterPrefab(assets, "Hellbroth_Projectile");
 			
 		potion = new Item(assets, "Hellbroth_of_Frost");
-		potion.Crafting.Add("opalchemy", 1);
+		potion.Crafting.Add("opalchemy", 2);
 		potion.RequiredItems.Add("FreezeGland", 4);
 		potion.RequiredItems.Add("Chain", 1);
 
@@ -508,7 +528,7 @@ public class PotionsPlus : BaseUnityPlugin
 		PrefabManager.RegisterPrefab(assets, "Hellbroth_Frost_Projectile");
 
 		potion = new Item(assets, "Hellbroth_of_Thors_Fury");
-		potion.Crafting.Add("opalchemy", 1);
+		potion.Crafting.Add("opalchemy", 2);
 		potion.RequiredItems.Add("Tar", 6);
 		potion.RequiredItems.Add("Thunderstone", 1);
 
@@ -519,7 +539,7 @@ public class PotionsPlus : BaseUnityPlugin
 
 
 		potion = new Item(assets, "Hellbroth_of_Eternal_Life");
-		potion.Crafting.Add("opalchemy", 1);
+		potion.Crafting.Add("opalchemy", 2);
 		potion.RequiredItems.Add("Honey", 5);
 		potion.RequiredItems.Add("Dandelion", 3);
 		PrefabManager.RegisterPrefab(assets, "Hellbroth_Life_Projectile");
@@ -566,7 +586,7 @@ public class PotionsPlus : BaseUnityPlugin
 		potion = new Item(assets, "Grand_Group_Healing");
 		if (API.IsLoaded())
 		{
-			potion.Crafting.Add("opalchemy", 1);
+			potion.Crafting.Add("opalchemy", 2);
 			potion.RequiredItems.Add("Honey", 4);
 			potion.RequiredItems.Add("Mushroom", 6);
 		}
@@ -577,7 +597,7 @@ public class PotionsPlus : BaseUnityPlugin
 		potion = new Item(assets, "Brew_of_Cunning_Toxicity");
 		if (API.IsLoaded())
 		{
-			potion.Crafting.Add("opalchemy", 1);
+			potion.Crafting.Add("opalchemy", 2);
 			potion.RequiredItems.Add("Ooze", 10);
 			potion.RequiredItems.Add("Bloodbag", 3);
 			potion.RequiredItems.Add("Dandelion", 4);
@@ -589,7 +609,7 @@ public class PotionsPlus : BaseUnityPlugin
 		potion = new Item(assets, "Brew_of_Fiery_Revenge");
 		if (API.IsLoaded())
 		{
-			potion.Crafting.Add("opalchemy", 1);
+			potion.Crafting.Add("opalchemy", 2);
 			potion.RequiredItems.Add("Resin", 20);
 			potion.RequiredItems.Add("Torch", 3);
 			potion.RequiredItems.Add("SurtlingCore", 2);
@@ -601,7 +621,7 @@ public class PotionsPlus : BaseUnityPlugin
 		potion = new Item(assets, "Brew_of_Icy_Touch");
 		if (API.IsLoaded())
 		{
-			potion.Crafting.Add("opalchemy", 1);
+			potion.Crafting.Add("opalchemy", 2);
 			potion.RequiredItems.Add("FreezeGland", 4);
 			potion.RequiredItems.Add("Carrot", 5);
 			potion.RequiredItems.Add("Turnip", 5);
@@ -613,7 +633,7 @@ public class PotionsPlus : BaseUnityPlugin
 		potion = new Item(assets, "Brew_of_Spiritual_Death");
 		if (API.IsLoaded())
 		{
-			potion.Crafting.Add("opalchemy", 1);
+			potion.Crafting.Add("opalchemy", 2);
 			potion.RequiredItems.Add("Chitin", 2);
 			potion.RequiredItems.Add("Entrails", 4);
 		}
@@ -624,7 +644,7 @@ public class PotionsPlus : BaseUnityPlugin
 		potion = new Item(assets, "Brew_of_Thunderous_Words");
 		if (API.IsLoaded())
 		{
-			potion.Crafting.Add("opalchemy", 1);
+			potion.Crafting.Add("opalchemy", 2);
 			potion.RequiredItems.Add("Obsidian", 3);
 			potion.RequiredItems.Add("GreydwarfEye", 6);
 			potion.RequiredItems.Add("Cloudberry", 2);
