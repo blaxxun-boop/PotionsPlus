@@ -492,15 +492,15 @@ public class PotionsPlus : BaseUnityPlugin
 		piece.RequiredItems.Add("SurtlingCore", 2, true);
 		piece.RequiredItems.Add("Iron", 4, true);
 
-		Item alchemystuff = new Item(assets, "Odins_Alchemy_Wand");
-		alchemystuff.Crafting.Add("opalchemy", 2);
-		alchemystuff.RequiredItems.Add("FineWood", 8);
-		alchemystuff.RequiredItems.Add("SurtlingCore", 1);
+		Item alchemyequip = new Item(assets, "Odins_Alchemy_Wand");
+		alchemyequip.Crafting.Add("opalchemy", 2);
+		alchemyequip.RequiredItems.Add("FineWood", 8);
+		alchemyequip.RequiredItems.Add("SurtlingCore", 1);
 
-		alchemystuff = new Item(assets, "Odins_Wizard_Hat");
-		alchemystuff.Crafting.Add("opalchemy", 2);
-		alchemystuff.RequiredItems.Add("LinenThread", 8);
-		alchemystuff.RequiredItems.Add("SurtlingCore", 1);
+		alchemyequip = new Item(assets, "Odins_Wizard_Hat");
+		alchemyequip.Crafting.Add("opalchemy", 2);
+		alchemyequip.RequiredItems.Add("LinenThread", 8);
+		alchemyequip.RequiredItems.Add("SurtlingCore", 1);
 
 		potion = new Item(assets, "Odins_Weapon_Oil");
 		potion.Crafting.Add("opalchemy", 1);
@@ -516,7 +516,9 @@ public class PotionsPlus : BaseUnityPlugin
 		aoe.m_damage.m_fire = hellbrothOfFlamesDamage.Value;
 		hellbrothOfFlamesDamage.SettingChanged += (_, _) => aoe.m_damage.m_fire = hellbrothOfFlamesDamage.Value;
 		PrefabManager.RegisterPrefab(assets, "Hellbroth_Projectile");
-			
+		PrefabManager.RegisterPrefab(assets, "Hellbroth_Orb_Projectile");
+		PrefabManager.RegisterPrefab(assets, "Hellbroth_of_Flames_Charge");
+
 		potion = new Item(assets, "Hellbroth_of_Frost");
 		potion.Crafting.Add("opalchemy", 2);
 		potion.RequiredItems.Add("FreezeGland", 4);
@@ -526,6 +528,8 @@ public class PotionsPlus : BaseUnityPlugin
 		aoe.m_damage.m_frost = hellbrothOfFrostDamage.Value;
 		hellbrothOfFrostDamage.SettingChanged += (_, _) => aoe.m_damage.m_frost = hellbrothOfFrostDamage.Value;
 		PrefabManager.RegisterPrefab(assets, "Hellbroth_Frost_Projectile");
+		PrefabManager.RegisterPrefab(assets, "Hellbroth_Frost_Orb_Projectile");
+		PrefabManager.RegisterPrefab(assets, "Hellbroth_of_Frost_Charge");
 
 		potion = new Item(assets, "Hellbroth_of_Thors_Fury");
 		potion.Crafting.Add("opalchemy", 2);
@@ -536,6 +540,8 @@ public class PotionsPlus : BaseUnityPlugin
 		aoe.m_damage.m_lightning = hellbrothOfThorsFuryDamage.Value;
 		hellbrothOfThorsFuryDamage.SettingChanged += (_, _) => aoe.m_damage.m_lightning = hellbrothOfThorsFuryDamage.Value;
 		PrefabManager.RegisterPrefab(assets, "Hellbroth_Thors_Fury_Projectile");
+		PrefabManager.RegisterPrefab(assets, "Hellbroth_of_Thors_Fury_Charge");
+		PrefabManager.RegisterPrefab(assets, "Hellbroth_Thors_Fury_Orb_Projectile");
 
 
 		potion = new Item(assets, "Hellbroth_of_Eternal_Life");

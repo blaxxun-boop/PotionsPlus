@@ -92,11 +92,17 @@
   "pp_odins_wizard_hat_description": "No Effect yet. Equip effect later.",
   "pp_odins_weapon_oil": "Odins Weapon Oil",
   "pp_odins_weapon_oil_description": "No Effect yet. Weapon effect later.",
+  "pp_hellbroth_of_thors_fury_charge": "Hellbroth of Thors Fury Charge",
+  "pp_hellbroth_of_thors_fury_charge_description": "A stack of Lightning Wand charges.",
+  "pp_hellbroth_of_flames_charge": "Hellbroth of Flames Charge",
+  "pp_hellbroth_of_flames_charge_description": "A stack of Flame Wand charges.",
+  "pp_hellbroth_of_frost_charge": "Hellbroth of Frost Charge",
+  "pp_hellbroth_of_frost_charge_description": "A stack of Frost Wand charges.",
   "pp_potion_skill_name": "Alchemy",
   "pp_potion_skill_description": "A form of chemistry and speculative philosophy that attempts to discover elixirs and a method for transmuting base metals into gold.",
   "pp_se_cheatdeath": "Cheat Death",
   "pp_se_cheatdeath_desc": "The stones power has brought you back.",
   "pp_se_cheatdeath_msg_start": "The stone shatters, leaving nothing but ashes blowing in the wind.",
-  "pp_hellbroth": "Hellbroth"
+  "pp_hellbroth_charge": "Hellbroth Charge, brew more in your cauldron."
 }
   
