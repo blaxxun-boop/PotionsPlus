@@ -65,6 +65,24 @@
   "pp_se_cheatdeath": "Обман смерти",
   "pp_se_cheatdeath_desc": "Сила камней вернула вас обратно.",
   "pp_se_cheatdeath_msg_start": "Камень разлетается вдребезги, не оставляя ничего, кроме пепла, развевающегося на ветру.",
-  "pp_hellbroth_of_thors_fury": "Хеллброт из Ярости Тора",
-  "pp_hellbroth_of_thors_fury_description": "Может быть брошен во врагов, чтобы ударить током и нанести {power} урона молнией."
+  "pp_hellbroth_of_flames": "Гелброт пламени",
+  "pp_hellbroth_of_flames_description": "Может быть брошен во врагов, чтобы заставить их гореть, нанося {силу} урона огнем. Рекомендуется только для безумных алхимиков",
+  "pp_hellbroth_of_frost": "Хеллброт мороза",
+  "pp_hellbroth_of_frost_description": "Может быть брошен во врагов, чтобы заставить их замерзнуть и получить {силу} урона от мороза",
+  "pp_hellbroth_of_thors_fury": "Хеллброт ярости Тора",
+  "pp_hellbroth_of_thors_fury_description": "Может быть брошен во врагов, чтобы ударить током и нанести {силу} урона молнией",
+  "pp_hellbroth_of_eternal_life": "Хеллброт вечной жизни",
+  "pp_hellbroth_of_eternal_life_description": "Может быть брошен, чтобы создать целебное облако. Исцеляет всех игроков внутри на {power}% здоровья с каждым тиком.",
+  "pp_odins_alchemy_wand": "Алхимический жезл Одина",
+  "pp_odins_alchemy_wand_description": "Волшебная палочка, которая накладывает хеллброты",
+  "pp_odins_wizard_hat": "Шляпа волшебника Одина",
+  "pp_odins_wizard_hat_description": "Шляпа для вашего волшебника",
+  "pp_hellbroth_of_thors_fury_charge": "Хеллброт ярости Торса Заряд",
+  "pp_hellbroth_of_thors_fury_charge_description": "Стак зарядов для жезла молний",
+  "pp_hellbroth_of_flames_charge": "Заряд Хеллброта пламени",
+  "pp_hellbroth_of_flames_charge_description": "Стак зарядов пламенного жезла",
+  "pp_hellbroth_of_frost_charge": "Хеллброт морозного заряда",
+  "pp_hellbroth_of_frost_charge_description": "Стак зарядов морозного жезла",
+  "pp_hellbroth_charge": "Заряд Хеллброта, варите больше в своем котле."
+
 }
