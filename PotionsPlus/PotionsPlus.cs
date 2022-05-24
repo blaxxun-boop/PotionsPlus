@@ -501,12 +501,12 @@ public class PotionsPlus : BaseUnityPlugin
 		alchemyequip.Crafting.Add("opalchemy", 2);
 		alchemyequip.RequiredItems.Add("LinenThread", 8);
 		alchemyequip.RequiredItems.Add("SurtlingCore", 1);
-
+		/*
 		potion = new Item(assets, "Odins_Weapon_Oil");
 		potion.Crafting.Add("opalchemy", 1);
 		potion.RequiredItems.Add("Tar", 8);
 		potion.RequiredItems.Add("Crystal", 1);
-
+		*/
 		potion = new Item(assets, "Hellbroth_of_Flames");
 		potion.Crafting.Add("opalchemy", 1);
 		potion.RequiredItems.Add("Resin", 8);
