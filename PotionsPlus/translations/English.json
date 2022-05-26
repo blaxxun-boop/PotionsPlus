@@ -96,11 +96,15 @@
   "pp_hellbroth_of_flames_charge_description": "A stack of Flame Wand charges.",
   "pp_hellbroth_of_frost_charge": "Hellbroth of Frost Charge",
   "pp_hellbroth_of_frost_charge_description": "A stack of Frost Wand charges.",
+  "pp_hellbroth_of_life_charge": "Hellbroth of Eternal Life Charge",
+  "pp_hellbroth_of_life_charge_description": "A stack of Life Wand charges.",
   "pp_potion_skill_name": "Alchemy",
   "pp_potion_skill_description": "A form of chemistry and speculative philosophy that attempts to discover elixirs and a method for transmuting base metals into gold.",
   "pp_se_cheatdeath": "Cheat Death",
   "pp_se_cheatdeath_desc": "The stones power has brought you back.",
   "pp_se_cheatdeath_msg_start": "The stone shatters, leaving nothing but ashes blowing in the wind.",
-  "pp_hellbroth_charge": "Hellbroth Charge, brew more in your cauldron."
+  "pp_hellbroth_charge": "Hellbroth Charge, brew more in your cauldron.",
+  "pp_odins_dragon_staff": "Odins Dragon Staff",
+  "pp_odins_dragon_staff_description": "A staff upgraded from the Wand."
 }
   

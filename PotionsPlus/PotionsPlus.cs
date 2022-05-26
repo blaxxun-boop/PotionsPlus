@@ -151,6 +151,7 @@ public class PotionsPlus : BaseUnityPlugin
 
 		AssetBundle assets = PrefabManager.RegisterAssetBundle("potions");
 
+
 		alchemy = new Skill("Alchemy", assets.LoadAsset<Sprite>("AlcSkill"));
 		alchemy.Name.Alias("pp_potion_skill_name");
 		alchemy.Description.Alias("pp_potion_skill_description");
@@ -492,21 +493,21 @@ public class PotionsPlus : BaseUnityPlugin
 		piece.RequiredItems.Add("SurtlingCore", 2, true);
 		piece.RequiredItems.Add("Iron", 4, true);
 
-		Item alchemyequip = new Item(assets, "Odins_Alchemy_Wand");
+		Item alchemyequip = new Item(assets, "Odins_Wizard_Hat");
 		alchemyequip.Crafting.Add("opalchemy", 2);
 		alchemyequip.RequiredItems.Add("FineWood", 8);
 		alchemyequip.RequiredItems.Add("SurtlingCore", 1);
 
-		alchemyequip = new Item(assets, "Odins_Wizard_Hat");
+		alchemyequip = new Item(assets, "Odins_Alchemy_Wand");
 		alchemyequip.Crafting.Add("opalchemy", 2);
 		alchemyequip.RequiredItems.Add("LinenThread", 8);
 		alchemyequip.RequiredItems.Add("SurtlingCore", 1);
-		/*
-		potion = new Item(assets, "Odins_Weapon_Oil");
-		potion.Crafting.Add("opalchemy", 1);
-		potion.RequiredItems.Add("Tar", 8);
-		potion.RequiredItems.Add("Crystal", 1);
-		*/
+
+		alchemyequip = new Item(assets, "Odins_Dragon_Staff");
+		alchemyequip.Crafting.Add("opalchemy", 2);
+		alchemyequip.RequiredItems.Add("FineWood", 1);
+		alchemyequip.RequiredItems.Add("SurtlingCore", 1);
+
 		potion = new Item(assets, "Hellbroth_of_Flames");
 		potion.Crafting.Add("opalchemy", 1);
 		potion.RequiredItems.Add("Resin", 8);
@@ -550,7 +551,9 @@ public class PotionsPlus : BaseUnityPlugin
 		potion.RequiredItems.Add("Dandelion", 3);
 		PrefabManager.RegisterPrefab(assets, "Hellbroth_Life_Projectile");
 		PrefabManager.RegisterPrefab(assets, "Hellbroth_Life_Explostion");
-		
+		PrefabManager.RegisterPrefab(assets, "Hellbroth_Life_Orb_Projectile");
+		PrefabManager.RegisterPrefab(assets, "Hellbroth_of_Eternal_Life_Charge");
+
 		GroupPotion ConvertConsumeSEStats(GameObject item)
 		{
 			ItemDrop.ItemData.SharedData shared = item.GetComponent<ItemDrop>().m_itemData.m_shared;
