@@ -12,19 +12,23 @@ using PieceManager;
 using ServerSync;
 using SkillManager;
 using UnityEngine;
+using LocalizationManager;
 using Random = UnityEngine.Random;
 
 namespace PotionsPlus;
 
 [BepInPlugin(ModGUID, ModName, ModVersion)]
 [BepInDependency("org.bepinex.plugins.groups", BepInDependency.DependencyFlags.SoftDependency)]
+[BepInDependency("MagicOverhaul", BepInDependency.DependencyFlags.SoftDependency)]
 public class PotionsPlus : BaseUnityPlugin
 {
 	private const string ModName = "PotionsPlus";
-	private const string ModVersion = "4.0.2";
+	private const string ModVersion = "4.1.0";
 	private const string ModGUID = "com.odinplus.potionsplus";
 
 	private static readonly ConfigSync configSync = new(ModName) { DisplayName = ModName, CurrentVersion = ModVersion, MinimumRequiredVersion = ModVersion };
+
+	private static readonly HashSet<string> wandProjectiles = new();
 
 	private static ConfigEntry<Toggle> serverConfigLocked = null!;
 	private static ConfigEntry<float> philosophersStoneXpGainFactor = null!;
@@ -124,7 +128,31 @@ public class PotionsPlus : BaseUnityPlugin
 	// Brew of Thunderous Words
 	private static ConfigEntry<float> brewOfThunderousWordsTTL = null!;
 	private static ConfigEntry<int> brewOfThunderousWordsRange = null!;
-
+	// Odins Wizard Hat
+	private static ConfigEntry<float> wizardHatConsumeChargeReduction = null!;
+	private static ConfigEntry<int> wizardHatBaseArmor = null!;
+	private static ConfigEntry<int> wizardHatArmorPerUpgrade = null!;
+	// Odins Warlock Hat
+	private static ConfigEntry<float> warlockHatSmokeScreenSizeIncrease = null!;
+	private static ConfigEntry<int> warlockHatSmokeScreenBlockIncrease = null!;
+	private static ConfigEntry<int> warlockHatSmokeScreenDurationIncrease = null!;
+	private static ConfigEntry<int> warlockHatBaseArmor = null!;
+	private static ConfigEntry<int> warlockHatArmorPerUpgrade = null!;
+	// Odins Weapon Oil
+	public static ConfigEntry<int> weaponOilDamageIncrease = null!;
+	private static ConfigEntry<float> weaponOilTTL = null!;
+	// Odins Dragon Staff
+	private static ConfigEntry<int> smokeScreenChanceToBlock = null!;
+	private static ConfigEntry<float> smokeScreenTTL = null!;
+	// Weak Mana Potion
+	private static ConfigEntry<int> weakManaPotionManaRestoration = null!;
+	private static ConfigEntry<int> weakManaPotionCooldown = null!;
+	// Giant Mana Potion
+	private static ConfigEntry<int> giantManaPotionManaRestoration = null!;
+	private static ConfigEntry<int> giantManaPotionCooldown = null!;
+	// Overflowing Mana Potion
+	private static ConfigEntry<int> overflowingManaPotionCooldown = null!;
+	
 	private ConfigEntry<T> config<T>(string group, string name, T value, ConfigDescription description, bool synchronizedSetting = true)
 	{
 		ConfigEntry<T> configEntry = Config.Bind(group, name, value, description);
@@ -147,10 +175,9 @@ public class PotionsPlus : BaseUnityPlugin
 
 	public void Awake()
 	{
-		LocalizationManager.LocalizationManager.Load();
+		Localizer.Load();
 
 		AssetBundle assets = PrefabManager.RegisterAssetBundle("potions");
-
 
 		alchemy = new Skill("Alchemy", assets.LoadAsset<Sprite>("AlcSkill"));
 		alchemy.Name.Alias("pp_potion_skill_name");
@@ -256,48 +283,84 @@ public class PotionsPlus : BaseUnityPlugin
 		// Brew of Thunderous Words
 		brewOfThunderousWordsTTL = config("Brew of Thunderous Words", "Effect Duration", 180f, new ConfigDescription("Effect duration for the Brew of Thunderous Words in seconds.", new AcceptableValueRange<float>(5f, 900f)));
 		brewOfThunderousWordsRange = config("Brew of Thunderous Words", "Effect Range", 30, new ConfigDescription("Range of the Brew of Thunderous Words effect.", new AcceptableValueRange<int>(3, 200)));
+		// Odins Wizard Hat
+		wizardHatConsumeChargeReduction = config("Odins Wizard Hat", "Charge Consumption Reduction", 40f, new ConfigDescription("Chance to not consume a Hellbroth charge, when using the Alchemy Wand or Dragon Staff while wearing the Wizard hat.", new AcceptableValueRange<float>(0f, 100f)));
+		wizardHatBaseArmor = config("Odins Wizard Hat", "Base Armor", 20, new ConfigDescription("Base armor for the Wizard Hat."));
+		wizardHatArmorPerUpgrade = config("Odins Wizard Hat", "Armor Per Level", 2, new ConfigDescription("Armor increase for each upgrade for the Wizard Hat."));
+		// Odins Warlock Hat
+		warlockHatSmokeScreenSizeIncrease = config("Odins Warlock Hat", "Smoke Screen Size Increase", 2f, new ConfigDescription("Radius increase for the smoke screen ability of the Dragon Staff while wearing the Warlock hat.", new AcceptableValueRange<float>(0f, 5f)));
+		warlockHatSmokeScreenDurationIncrease = config("Odins Warlock Hat", "Smoke Screen Duration Increase", 2, new ConfigDescription("Duration increase for the smoke screen ability of the Dragon Staff while wearing the Warlock hat in seconds.", new AcceptableValueRange<int>(0, 15)));
+		warlockHatSmokeScreenBlockIncrease = config("Odins Warlock Hat", "Smoke Screen Block Chance Increase", 25, new ConfigDescription("Projectile block chance increase for the smoke screen ability of the Dragon Staff while wearing the Warlock hat.", new AcceptableValueRange<int>(0, 100)));
+		warlockHatBaseArmor = config("Odins Warlock Hat", "Base Armor", 20, new ConfigDescription("Base armor for the Warlock Hat."));
+		warlockHatArmorPerUpgrade = config("Odins Warlock Hat", "Armor Per Level", 2, new ConfigDescription("Armor increase for each upgrade for the Warlock Hat."));
+		// Odins Dragon Staff
+		smokeScreenChanceToBlock = config("Odins Dragon Staff", "Block Chance", 50, new ConfigDescription("Chance to block projectiles for the smoke screen effect of Odins Dragon Staff.", new AcceptableValueRange<int>(0, 100)));
+		smokeScreenTTL = config("Odins Dragon Staff", "Effect Duration", 8f, new ConfigDescription("Effect duration for the smoke screen effect of Odins Dragon Staff in seconds.", new AcceptableValueRange<float>(1f, 30f)));
+		// Odins Weapon Oil
+		weaponOilDamageIncrease = config("Odins Weapon Oil", "Damage Increase", 5, new ConfigDescription("Damage increase for weapons from the Odins Weapon Oil effect.", new AcceptableValueRange<int>(0, 100)));
+		weaponOilTTL = config("Odins Weapon Oil", "Effect Duration", 30f, new ConfigDescription("Effect duration for Odins Weapon Oil in minutes.", new AcceptableValueRange<float>(1f, 120f)));
+		// Weak Mana Potion
+		weakManaPotionManaRestoration = config("Weak Mana Potion", "Mana Restoration", 15, new ConfigDescription("Mana restoration from the Weak Mana Potion effect."));
+		weakManaPotionCooldown = config("Weak Mana Potion", "Cooldown Duration", 120, new ConfigDescription("Cooldown of the Weak Mana Potion in seconds.", new AcceptableValueRange<int>(5, 900)));
+		// Giant Mana Potion
+		giantManaPotionManaRestoration = config("Giant Mana Potion", "Mana Restoration", 75, new ConfigDescription("Mana restoration from the Giant Mana Potion effect."));
+		giantManaPotionCooldown = config("Giant Mana Potion", "Cooldown Duration", 180, new ConfigDescription("Cooldown of the Giant Mana Potion in seconds.", new AcceptableValueRange<int>(5, 900)));
+		// Overflowing Mana Potion
+		overflowingManaPotionCooldown = config("Overflowing Mana Potion", "Cooldown Duration", 300, new ConfigDescription("Cooldown of the Overflowing Mana Potion in seconds.", new AcceptableValueRange<int>(5, 900)));
 		
-		LocalizationManager.LocalizationManager.AddPlaceholder("pp_flask_elements_description", "duration", flaskOfElementsTTL, ttl => (ttl / 60f).ToString("0.#"));
-		LocalizationManager.LocalizationManager.AddPlaceholder("pp_flask_secondwind_description", "duration", flaskOfSecondWindTTL, ttl => (ttl / 60f).ToString("0.#"));
-		LocalizationManager.LocalizationManager.AddPlaceholder("pp_flask_god_description", "power", flaskOfGodsHealing);
-		LocalizationManager.LocalizationManager.AddPlaceholder("pp_elixir_healing_description", "power", grandHealingTidePotionHealthOverTime);
-		LocalizationManager.LocalizationManager.AddPlaceholder("pp_elixir_healing_description", "duration", grandHealingTidePotionTTL);
-		LocalizationManager.LocalizationManager.AddPlaceholder("pp_elixir_spiritual_description", "power", grandSpiritualHealingPotionHealthOverTime);
-		LocalizationManager.LocalizationManager.AddPlaceholder("pp_elixir_stam_description", "power", grandStaminaElixirStaminaOverTime);
-		LocalizationManager.LocalizationManager.AddPlaceholder("pp_elixir_stam_description", "duration", grandStaminaElixirTTL);
-		LocalizationManager.LocalizationManager.AddPlaceholder("pp_elixir_stealth_description", "duration", grandStealthElixirTTL);
-		LocalizationManager.LocalizationManager.AddPlaceholder("pp_potion_healing_description", "power", mediumHealingTideFlaskHealthOverTime);
-		LocalizationManager.LocalizationManager.AddPlaceholder("pp_potion_healing_description", "duration", mediumHealingTideFlaskTTL);
-		LocalizationManager.LocalizationManager.AddPlaceholder("pp_potion_spiritual_description", "power", mediumSpiritualHealingFlaskHealthOverTime);
-		LocalizationManager.LocalizationManager.AddPlaceholder("pp_potion_stam_description", "power", mediumStaminaFlaskStaminaOverTime);
-		LocalizationManager.LocalizationManager.AddPlaceholder("pp_vial_healing_description", "power", lesserHealingTideVialHealthOverTime);
-		LocalizationManager.LocalizationManager.AddPlaceholder("pp_vial_healing_description", "duration", lesserHealingTideVialTTL);
-		LocalizationManager.LocalizationManager.AddPlaceholder("pp_vial_spiritual_description", "power", lesserSpiritualHealingVialHealthOverTime);
-		LocalizationManager.LocalizationManager.AddPlaceholder("pp_vial_stam_description", "power", lesserStaminaVialStaminaOverTime);
-		LocalizationManager.LocalizationManager.AddPlaceholder("pp_hellbroth_of_flames_description", "power", hellbrothOfFlamesDamage);
-		LocalizationManager.LocalizationManager.AddPlaceholder("pp_hellbroth_of_frost_description", "power", hellbrothOfFrostDamage);
-		LocalizationManager.LocalizationManager.AddPlaceholder("pp_hellbroth_of_thors_fury", "power", hellbrothOfThorsFuryDamage);
-		LocalizationManager.LocalizationManager.AddPlaceholder("pp_hellbroth_of_eternal_life_description", "power", hellbrothOfEternalLifeHealing);
-		LocalizationManager.LocalizationManager.AddPlaceholder("pp_lesser_group_healing_description", "power", brewOfFaintGroupHealingHealthOverTime);
-		LocalizationManager.LocalizationManager.AddPlaceholder("pp_lesser_group_healing_description", "range", brewOfFaintGroupHealingRange);
-		LocalizationManager.LocalizationManager.AddPlaceholder("pp_medium_group_healing_description", "power", brewOfGroupHealingHealthOverTime);
-		LocalizationManager.LocalizationManager.AddPlaceholder("pp_medium_group_healing_description", "range", brewOfGroupHealingRange);
-		LocalizationManager.LocalizationManager.AddPlaceholder("pp_grand_group_healing_description", "power", brewOfGrandGroupHealingHealthOverTime);
-		LocalizationManager.LocalizationManager.AddPlaceholder("pp_grand_group_healing_description", "range", brewOfGrandGroupHealingRange);
-		LocalizationManager.LocalizationManager.AddPlaceholder("pp_brew_of_toxicity_description", "range", brewOfCunningToxicityRange);
-		LocalizationManager.LocalizationManager.AddPlaceholder("pp_brew_of_fiery_revenge_description", "range", brewOfFieryRevengeRange);
-		LocalizationManager.LocalizationManager.AddPlaceholder("pp_brew_of_icy_touch_description", "range", brewOfIcyTouchRange);
-		LocalizationManager.LocalizationManager.AddPlaceholder("pp_brew_of_spiritual_death_description", "range", brewOfSpiritualDeathRange);
-		LocalizationManager.LocalizationManager.AddPlaceholder("pp_brew_of_thunderous_words_description", "range", brewOfThunderousWordsRange);
+		Localizer.AddPlaceholder("pp_flask_elements_description", "duration", flaskOfElementsTTL, ttl => (ttl / 60f).ToString("0.#"));
+		Localizer.AddPlaceholder("pp_flask_secondwind_description", "duration", flaskOfSecondWindTTL, ttl => (ttl / 60f).ToString("0.#"));
+		Localizer.AddPlaceholder("pp_flask_fort_description", "duration", flaskOfFortificationTTL, ttl => (ttl / 60f).ToString("0.#"));
+		Localizer.AddPlaceholder("pp_flask_god_description", "power", flaskOfGodsHealing);
+		Localizer.AddPlaceholder("pp_elixir_healing_description", "power", grandHealingTidePotionHealthOverTime);
+		Localizer.AddPlaceholder("pp_elixir_healing_description", "duration", grandHealingTidePotionTTL);
+		Localizer.AddPlaceholder("pp_elixir_spiritual_description", "power", grandSpiritualHealingPotionHealthOverTime);
+		Localizer.AddPlaceholder("pp_elixir_stam_description", "power", grandStaminaElixirStaminaOverTime);
+		Localizer.AddPlaceholder("pp_elixir_stam_description", "duration", grandStaminaElixirTTL);
+		Localizer.AddPlaceholder("pp_elixir_stealth_description", "duration", grandStealthElixirTTL);
+		Localizer.AddPlaceholder("pp_potion_healing_description", "power", mediumHealingTideFlaskHealthOverTime);
+		Localizer.AddPlaceholder("pp_potion_healing_description", "duration", mediumHealingTideFlaskTTL);
+		Localizer.AddPlaceholder("pp_potion_spiritual_description", "power", mediumSpiritualHealingFlaskHealthOverTime);
+		Localizer.AddPlaceholder("pp_potion_stam_description", "power", mediumStaminaFlaskStaminaOverTime);
+		Localizer.AddPlaceholder("pp_vial_healing_description", "power", lesserHealingTideVialHealthOverTime);
+		Localizer.AddPlaceholder("pp_vial_healing_description", "duration", lesserHealingTideVialTTL);
+		Localizer.AddPlaceholder("pp_vial_spiritual_description", "power", lesserSpiritualHealingVialHealthOverTime);
+		Localizer.AddPlaceholder("pp_vial_stam_description", "power", lesserStaminaVialStaminaOverTime);
+		Localizer.AddPlaceholder("pp_hellbroth_of_flames_description", "power", hellbrothOfFlamesDamage);
+		Localizer.AddPlaceholder("pp_hellbroth_of_frost_description", "power", hellbrothOfFrostDamage);
+		Localizer.AddPlaceholder("pp_hellbroth_of_thors_fury", "power", hellbrothOfThorsFuryDamage);
+		Localizer.AddPlaceholder("pp_hellbroth_of_eternal_life_description", "power", hellbrothOfEternalLifeHealing);
+		Localizer.AddPlaceholder("pp_lesser_group_healing_description", "power", brewOfFaintGroupHealingHealthOverTime);
+		Localizer.AddPlaceholder("pp_lesser_group_healing_description", "range", brewOfFaintGroupHealingRange);
+		Localizer.AddPlaceholder("pp_medium_group_healing_description", "power", brewOfGroupHealingHealthOverTime);
+		Localizer.AddPlaceholder("pp_medium_group_healing_description", "range", brewOfGroupHealingRange);
+		Localizer.AddPlaceholder("pp_grand_group_healing_description", "power", brewOfGrandGroupHealingHealthOverTime);
+		Localizer.AddPlaceholder("pp_grand_group_healing_description", "range", brewOfGrandGroupHealingRange);
+		Localizer.AddPlaceholder("pp_brew_of_toxicity_description", "range", brewOfCunningToxicityRange);
+		Localizer.AddPlaceholder("pp_brew_of_fiery_revenge_description", "range", brewOfFieryRevengeRange);
+		Localizer.AddPlaceholder("pp_brew_of_icy_touch_description", "range", brewOfIcyTouchRange);
+		Localizer.AddPlaceholder("pp_brew_of_spiritual_death_description", "range", brewOfSpiritualDeathRange);
+		Localizer.AddPlaceholder("pp_brew_of_thunderous_words_description", "range", brewOfThunderousWordsRange);
+		Localizer.AddPlaceholder("pp_odins_wizard_hat_description", "power", wizardHatConsumeChargeReduction);
+		Localizer.AddPlaceholder("pp_odins_weapon_oil_description", "power", weaponOilDamageIncrease);
+		Localizer.AddPlaceholder("pp_odins_weapon_oil_description", "duration", weaponOilTTL);
+		Localizer.AddPlaceholder("pp_weapon_oil_description", "power", weaponOilDamageIncrease);
+		Localizer.AddPlaceholder("pp_odins_dragon_staff_description", "power", smokeScreenChanceToBlock);
+		Localizer.AddPlaceholder("pp_odins_dragon_staff_description", "duration", smokeScreenTTL);
+		Localizer.AddPlaceholder("pp_odins_warlock_hat_description", "power", warlockHatSmokeScreenBlockIncrease);
+		Localizer.AddPlaceholder("pp_odins_warlock_hat_description", "radius", warlockHatSmokeScreenSizeIncrease);
+		Localizer.AddPlaceholder("pp_odins_warlock_hat_description", "duration", warlockHatSmokeScreenDurationIncrease);
+		Localizer.AddPlaceholder("pp_lesser_mana_potion_description", "power", weakManaPotionManaRestoration);
+		Localizer.AddPlaceholder("pp_large_mana_potion_description", "power", giantManaPotionManaRestoration);
 
 		Assembly assembly = Assembly.GetExecutingAssembly();
 		Harmony harmony = new(ModGUID);
 		harmony.PatchAll(assembly);
 
-		void SEValue<T>(Item potion, Action<SE_Stats, T> setter, ConfigEntry<T> config)
+		void ItemValue<T>(Item item, Action<ItemDrop.ItemData.SharedData, T> setter, ConfigEntry<T> config)
 		{
-			string itemName = potion.Prefab.GetComponent<ItemDrop>().m_itemData.m_shared.m_name;
-			void set() => setter((SE_Stats)potion.Prefab.GetComponent<ItemDrop>().m_itemData.m_shared.m_consumeStatusEffect, config.Value);
+			string itemName = item.Prefab.GetComponent<ItemDrop>().m_itemData.m_shared.m_name;
+			void set() => setter(item.Prefab.GetComponent<ItemDrop>().m_itemData.m_shared, config.Value);
 			config.SettingChanged += (_, _) =>
 			{
 				if (ObjectDB.instance)
@@ -307,13 +370,31 @@ public class PotionsPlus : BaseUnityPlugin
 					{
 						if (itemName == itemdata.m_shared.m_name)
 						{
-							setter((SE_Stats)itemdata.m_shared.m_consumeStatusEffect, config.Value);
+							setter(itemdata.m_shared, config.Value);
 						}
 					}
 				}
 				set();
 			};
 			set();
+		}
+
+		void SEValue<T>(Item potion, Action<SE_Stats, T> setter, ConfigEntry<T> config) => ItemValue(potion, (i, c) => setter((SE_Stats)i.m_consumeStatusEffect, c), config);
+
+		T ConvertConsumeSEStats<T>(GameObject item) where T : StatusEffect
+		{
+			ItemDrop.ItemData.SharedData shared = item.GetComponent<ItemDrop>().m_itemData.m_shared;
+			StatusEffect stats = shared.m_consumeStatusEffect;
+			T ownSE = ScriptableObject.CreateInstance<T>();
+			shared.m_consumeStatusEffect = ownSE;
+
+			ownSE.name = stats.name;
+			foreach (FieldInfo field in stats.GetType().GetFields(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic))
+			{
+				field.SetValue(ownSE, field.GetValue(stats));
+			}
+
+			return ownSE;
 		}
 
 		Item potion = new(assets, "Potion_Meadbase");
@@ -493,31 +574,69 @@ public class PotionsPlus : BaseUnityPlugin
 		piece.RequiredItems.Add("SurtlingCore", 2, true);
 		piece.RequiredItems.Add("Iron", 4, true);
 
-		Item alchemyequip = new Item(assets, "Odins_Wizard_Hat");
-		alchemyequip.Crafting.Add("opalchemy", 2);
-		alchemyequip.RequiredItems.Add("FineWood", 8);
-		alchemyequip.RequiredItems.Add("SurtlingCore", 1);
+		Item alchemyEquipment = new(assets, "Odins_Alchemy_Wand");
+		alchemyEquipment.Crafting.Add(CraftingTable.Forge, 2);
+		alchemyEquipment.RequiredItems.Add("FineWood", 8);
+		alchemyEquipment.RequiredItems.Add("SurtlingCore", 1);
+		alchemyEquipment.RequiredItems.Add("Copper", 1);
 
-		alchemyequip = new Item(assets, "Odins_Alchemy_Wand");
-		alchemyequip.Crafting.Add("opalchemy", 2);
-		alchemyequip.RequiredItems.Add("LinenThread", 8);
-		alchemyequip.RequiredItems.Add("SurtlingCore", 1);
+		alchemyEquipment = new Item(assets, "Odins_Wizard_Hat");
+		alchemyEquipment.Crafting.Add(CraftingTable.Workbench, 5);
+		alchemyEquipment.MaximumRequiredStationLevel = 5;
+		alchemyEquipment.RequiredItems.Add("LinenThread", 20);
+		alchemyEquipment.RequiredItems.Add("SurtlingCore", 5);
+		alchemyEquipment.RequiredUpgradeItems.Add("LinenThread", 10);
+		alchemyEquipment.RequiredUpgradeItems.Add("SurtlingCore", 2);
 
-		alchemyequip = new Item(assets, "Odins_Dragon_Staff");
-		alchemyequip.Crafting.Add("opalchemy", 2);
-		alchemyequip.RequiredItems.Add("FineWood", 1);
-		alchemyequip.RequiredItems.Add("SurtlingCore", 1);
+		ItemValue(alchemyEquipment, (item, value) => item.m_armor = value, wizardHatBaseArmor);
+		ItemValue(alchemyEquipment, (item, value) => item.m_armorPerLevel = value, wizardHatArmorPerUpgrade);
+
+		alchemyEquipment = new Item(assets, "Odins_Warlock_Hat");
+		alchemyEquipment.Crafting.Add(CraftingTable.Workbench, 5);
+		alchemyEquipment.MaximumRequiredStationLevel = 5;
+		alchemyEquipment.RequiredItems.Add("LinenThread", 20);
+		alchemyEquipment.RequiredItems.Add("SurtlingCore", 5);
+		alchemyEquipment.RequiredUpgradeItems.Add("LinenThread", 10);
+		alchemyEquipment.RequiredUpgradeItems.Add("SurtlingCore", 2);
+
+		ItemValue(alchemyEquipment, (item, value) => item.m_armor = value, warlockHatBaseArmor);
+		ItemValue(alchemyEquipment, (item, value) => item.m_armorPerLevel = value, warlockHatArmorPerUpgrade);
+		
+		alchemyEquipment = new Item(assets, "Odins_Dragon_Staff");
+		alchemyEquipment.Crafting.Add(CraftingTable.Workbench, 3);
+		alchemyEquipment.MaximumRequiredStationLevel = 5;
+		alchemyEquipment.RequiredItems.Add("Odins_Alchemy_Wand", 1);
+		alchemyEquipment.RequiredItems.Add("ElderBark", 40);
+		alchemyEquipment.RequiredItems.Add("BlackMetal", 40);
+		alchemyEquipment.RequiredItems.Add("SurtlingCore", 1);
+		alchemyEquipment.RequiredUpgradeItems.Add("ElderBark", 20);
+		alchemyEquipment.RequiredUpgradeItems.Add("BlackMetal", 20);
+
+		GameObject smokeScreen = PrefabManager.RegisterPrefab(assets, "Staff_Smoke_Cloud");
+		smokeScreen.AddComponent<SmokescreenOwner>();
+
+		smokeScreen.GetComponent<TimedDestruction>().m_timeout = smokeScreenTTL.Value;
+		smokeScreenTTL.SettingChanged += (_, _) => smokeScreen.GetComponent<TimedDestruction>().m_timeout = smokeScreenTTL.Value;
+
+		potion = new Item(assets, "Odins_Weapon_Oil");
+		potion.Crafting.Add("opalchemy", 1);
+		potion.RequiredItems.Add("Tar", 8);
+		potion.RequiredItems.Add("Crystal", 1);
+
+		SEValue(potion, (effect, value) => effect.m_ttl = value * 60f, weaponOilTTL);
+		ConvertConsumeSEStats<WeaponOil>(potion.Prefab);
 
 		potion = new Item(assets, "Hellbroth_of_Flames");
 		potion.Crafting.Add("opalchemy", 1);
 		potion.RequiredItems.Add("Resin", 8);
 		potion.RequiredItems.Add("Torch", 1);
 
-		Aoe aoe = PrefabManager.RegisterPrefab(assets, "Hellbroth_Explosion").GetComponent<Aoe>();
-		aoe.m_damage.m_fire = hellbrothOfFlamesDamage.Value;
-		hellbrothOfFlamesDamage.SettingChanged += (_, _) => aoe.m_damage.m_fire = hellbrothOfFlamesDamage.Value;
+		Aoe fireAoe = PrefabManager.RegisterPrefab(assets, "Hellbroth_Explosion").GetComponent<Aoe>();
+		fireAoe.m_damage.m_fire = hellbrothOfFlamesDamage.Value;
+		hellbrothOfFlamesDamage.SettingChanged += (_, _) => fireAoe.m_damage.m_fire = hellbrothOfFlamesDamage.Value;
 		PrefabManager.RegisterPrefab(assets, "Hellbroth_Projectile");
 		PrefabManager.RegisterPrefab(assets, "Hellbroth_Orb_Projectile");
+		wandProjectiles.Add("Hellbroth_Orb_Projectile");
 		PrefabManager.RegisterPrefab(assets, "Hellbroth_of_Flames_Charge");
 
 		potion = new Item(assets, "Hellbroth_of_Frost");
@@ -525,11 +644,12 @@ public class PotionsPlus : BaseUnityPlugin
 		potion.RequiredItems.Add("FreezeGland", 4);
 		potion.RequiredItems.Add("Chain", 1);
 
-		aoe = PrefabManager.RegisterPrefab(assets, "Hellbroth_Frost_Explosion").GetComponent<Aoe>();
-		aoe.m_damage.m_frost = hellbrothOfFrostDamage.Value;
-		hellbrothOfFrostDamage.SettingChanged += (_, _) => aoe.m_damage.m_frost = hellbrothOfFrostDamage.Value;
+		Aoe frostAoe = PrefabManager.RegisterPrefab(assets, "Hellbroth_Frost_Explosion").GetComponent<Aoe>();
+		frostAoe.m_damage.m_frost = hellbrothOfFrostDamage.Value;
+		hellbrothOfFrostDamage.SettingChanged += (_, _) => frostAoe.m_damage.m_frost = hellbrothOfFrostDamage.Value;
 		PrefabManager.RegisterPrefab(assets, "Hellbroth_Frost_Projectile");
 		PrefabManager.RegisterPrefab(assets, "Hellbroth_Frost_Orb_Projectile");
+		wandProjectiles.Add("Hellbroth_Frost_Orb_Projectile");
 		PrefabManager.RegisterPrefab(assets, "Hellbroth_of_Frost_Charge");
 
 		potion = new Item(assets, "Hellbroth_of_Thors_Fury");
@@ -537,13 +657,13 @@ public class PotionsPlus : BaseUnityPlugin
 		potion.RequiredItems.Add("Tar", 6);
 		potion.RequiredItems.Add("Thunderstone", 1);
 
-		aoe = PrefabManager.RegisterPrefab(assets, "Hellbroth_Thors_Fury_Explosion").GetComponent<Aoe>();
-		aoe.m_damage.m_lightning = hellbrothOfThorsFuryDamage.Value;
-		hellbrothOfThorsFuryDamage.SettingChanged += (_, _) => aoe.m_damage.m_lightning = hellbrothOfThorsFuryDamage.Value;
+		Aoe lightningAoe = PrefabManager.RegisterPrefab(assets, "Hellbroth_Thors_Fury_Explosion").GetComponent<Aoe>();
+		lightningAoe.m_damage.m_lightning = hellbrothOfThorsFuryDamage.Value;
+		hellbrothOfThorsFuryDamage.SettingChanged += (_, _) => lightningAoe.m_damage.m_lightning = hellbrothOfThorsFuryDamage.Value;
 		PrefabManager.RegisterPrefab(assets, "Hellbroth_Thors_Fury_Projectile");
 		PrefabManager.RegisterPrefab(assets, "Hellbroth_of_Thors_Fury_Charge");
 		PrefabManager.RegisterPrefab(assets, "Hellbroth_Thors_Fury_Orb_Projectile");
-
+		wandProjectiles.Add("Hellbroth_Thors_Fury_Orb_Projectile");
 
 		potion = new Item(assets, "Hellbroth_of_Eternal_Life");
 		potion.Crafting.Add("opalchemy", 2);
@@ -552,23 +672,8 @@ public class PotionsPlus : BaseUnityPlugin
 		PrefabManager.RegisterPrefab(assets, "Hellbroth_Life_Projectile");
 		PrefabManager.RegisterPrefab(assets, "Hellbroth_Life_Explostion");
 		PrefabManager.RegisterPrefab(assets, "Hellbroth_Life_Orb_Projectile");
+		wandProjectiles.Add("Hellbroth_Life_Orb_Projectile");
 		PrefabManager.RegisterPrefab(assets, "Hellbroth_of_Eternal_Life_Charge");
-
-		GroupPotion ConvertConsumeSEStats(GameObject item)
-		{
-			ItemDrop.ItemData.SharedData shared = item.GetComponent<ItemDrop>().m_itemData.m_shared;
-			SE_Stats stats = (SE_Stats)shared.m_consumeStatusEffect;
-			GroupPotion groupPotion = ScriptableObject.CreateInstance<GroupPotion>();
-			shared.m_consumeStatusEffect = groupPotion;
-
-			groupPotion.name = stats.name;
-			foreach (FieldInfo field in typeof(SE_Stats).GetFields(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic))
-			{
-				field.SetValue(groupPotion, field.GetValue(stats));
-			}
-
-			return groupPotion;
-		}
 
 		potion = new Item(assets, "Lesser_Group_Healing");
 		if (API.IsLoaded())
@@ -579,8 +684,8 @@ public class PotionsPlus : BaseUnityPlugin
 		}
 		SEValue(potion, (effect, value) => effect.m_ttl = value, brewOfFaintGroupHealingCooldown);
 		SEValue(potion, (effect, value) => effect.m_healthOverTime = value, brewOfFaintGroupHealingHealthOverTime);
-		ConvertConsumeSEStats(potion.Prefab).m_healthOverTimeDuration = 1f;
-		
+		ConvertConsumeSEStats<GroupPotion>(potion.Prefab).m_healthOverTimeDuration = 1f;
+
 		potion = new Item(assets, "Medium_Group_Healing");
 		if (API.IsLoaded())
 		{
@@ -590,8 +695,8 @@ public class PotionsPlus : BaseUnityPlugin
 		}
 		SEValue(potion, (effect, value) => effect.m_ttl = value, brewOfGroupHealingCooldown);
 		SEValue(potion, (effect, value) => effect.m_healthOverTime = value, brewOfGroupHealingHealthOverTime);
-		ConvertConsumeSEStats(potion.Prefab).m_healthOverTimeDuration = 1f;
-		
+		ConvertConsumeSEStats<GroupPotion>(potion.Prefab).m_healthOverTimeDuration = 1f;
+
 		potion = new Item(assets, "Grand_Group_Healing");
 		if (API.IsLoaded())
 		{
@@ -601,8 +706,8 @@ public class PotionsPlus : BaseUnityPlugin
 		}
 		SEValue(potion, (effect, value) => effect.m_ttl = value, brewOfGrandGroupHealingCooldown);
 		SEValue(potion, (effect, value) => effect.m_healthOverTime = value, brewOfGrandGroupHealingHealthOverTime);
-		ConvertConsumeSEStats(potion.Prefab).m_healthOverTimeDuration = 1f;
-		
+		ConvertConsumeSEStats<GroupPotion>(potion.Prefab).m_healthOverTimeDuration = 1f;
+
 		potion = new Item(assets, "Brew_of_Cunning_Toxicity");
 		if (API.IsLoaded())
 		{
@@ -611,7 +716,7 @@ public class PotionsPlus : BaseUnityPlugin
 			potion.RequiredItems.Add("Bloodbag", 3);
 			potion.RequiredItems.Add("Dandelion", 4);
 		}
-		ConvertConsumeSEStats(potion.Prefab).damageType = HitData.DamageType.Poison;
+		ConvertConsumeSEStats<GroupPotion>(potion.Prefab).damageType = HitData.DamageType.Poison;
 		SEValue(potion, (effect, value) => effect.m_ttl = value, brewOfCunningToxicityTTL);
 		SEValue(potion, (effect, value) => ((GroupPotion)effect).range = value, brewOfCunningToxicityRange);
 
@@ -623,7 +728,7 @@ public class PotionsPlus : BaseUnityPlugin
 			potion.RequiredItems.Add("Torch", 3);
 			potion.RequiredItems.Add("SurtlingCore", 2);
 		}
-		ConvertConsumeSEStats(potion.Prefab).damageType = HitData.DamageType.Fire;
+		ConvertConsumeSEStats<GroupPotion>(potion.Prefab).damageType = HitData.DamageType.Fire;
 		SEValue(potion, (effect, value) => effect.m_ttl = value, brewOfFieryRevengeTTL);
 		SEValue(potion, (effect, value) => ((GroupPotion)effect).range = value, brewOfFieryRevengeRange);
 
@@ -635,7 +740,7 @@ public class PotionsPlus : BaseUnityPlugin
 			potion.RequiredItems.Add("Carrot", 5);
 			potion.RequiredItems.Add("Turnip", 5);
 		}
-		ConvertConsumeSEStats(potion.Prefab).damageType = HitData.DamageType.Frost;
+		ConvertConsumeSEStats<GroupPotion>(potion.Prefab).damageType = HitData.DamageType.Frost;
 		SEValue(potion, (effect, value) => effect.m_ttl = value, brewOfIcyTouchTTL);
 		SEValue(potion, (effect, value) => ((GroupPotion)effect).range = value, brewOfIcyTouchRange);
 
@@ -646,7 +751,7 @@ public class PotionsPlus : BaseUnityPlugin
 			potion.RequiredItems.Add("Chitin", 2);
 			potion.RequiredItems.Add("Entrails", 4);
 		}
-		ConvertConsumeSEStats(potion.Prefab).damageType = HitData.DamageType.Spirit;
+		ConvertConsumeSEStats<GroupPotion>(potion.Prefab).damageType = HitData.DamageType.Spirit;
 		SEValue(potion, (effect, value) => effect.m_ttl = value, brewOfSpiritualDeathTTL);
 		SEValue(potion, (effect, value) => ((GroupPotion)effect).range = value, brewOfSpiritualDeathRange);
 
@@ -658,10 +763,45 @@ public class PotionsPlus : BaseUnityPlugin
 			potion.RequiredItems.Add("GreydwarfEye", 6);
 			potion.RequiredItems.Add("Cloudberry", 2);
 		}
-		ConvertConsumeSEStats(potion.Prefab).damageType = HitData.DamageType.Lightning;
+		ConvertConsumeSEStats<GroupPotion>(potion.Prefab).damageType = HitData.DamageType.Lightning;
 		SEValue(potion, (effect, value) => effect.m_ttl = value, brewOfThunderousWordsTTL);
 		SEValue(potion, (effect, value) => ((GroupPotion)effect).range = value, brewOfThunderousWordsRange);
 
+		potion = new Item(assets, "Lesser_Mana_Potion");
+		if (MO_API.IsLoaded())
+		{
+			potion.Crafting.Add("opalchemy", 1);
+			potion.RequiredItems.Add("Thistle", 1);
+			potion.RequiredItems.Add("GreydwarfEye", 1);
+			potion.RequiredItems.Add("Dandelion", 1);
+		}
+		ConvertConsumeSEStats<ManaPotion>(potion.Prefab);
+		SEValue(potion, (effect, value) => effect.m_ttl = value, weakManaPotionCooldown);
+		SEValue(potion, (effect, value) => ((ManaPotion)effect).manaToRestore = value, weakManaPotionManaRestoration);
+		
+		potion = new Item(assets, "Large_Mana_Potion");
+		if (MO_API.IsLoaded())
+		{
+			potion.Crafting.Add("opalchemy", 2);
+			potion.RequiredItems.Add("Thistle", 3);
+			potion.RequiredItems.Add("GreydwarfEye", 3);
+			potion.RequiredItems.Add("Dandelion", 3);
+		}
+		ConvertConsumeSEStats<ManaPotion>(potion.Prefab);
+		SEValue(potion, (effect, value) => effect.m_ttl = value, giantManaPotionCooldown);
+		SEValue(potion, (effect, value) => ((ManaPotion)effect).manaToRestore = value, giantManaPotionManaRestoration);
+		
+		potion = new Item(assets, "Grand_Mana_Potion");
+		if (MO_API.IsLoaded())
+		{
+			potion.Crafting.Add("opalchemy", 2);
+			potion.RequiredItems.Add("Thistle", 4);
+			potion.RequiredItems.Add("GreydwarfEye", 4);
+			potion.RequiredItems.Add("Dandelion", 4);
+		}
+		ConvertConsumeSEStats<ManaPotion>(potion.Prefab).manaToRestore = 99999999;
+		SEValue(potion, (effect, value) => effect.m_ttl = value, overflowingManaPotionCooldown);
+		
 		void AddStatusEffectModifier(Item item)
 		{
 			SE_Stats statusEffect = (SE_Stats)item.Prefab.GetComponent<ItemDrop>().m_itemData.m_shared.m_equipStatusEffect;
@@ -746,7 +886,7 @@ public class PotionsPlus : BaseUnityPlugin
 
 		private static void SetUid(Incinerator incinerator, long sender)
 		{
-			if (incinerator.name.StartsWith("opcauldron"))
+			if (incinerator.name.StartsWith("opcauldron", StringComparison.Ordinal))
 			{
 				uid = sender;
 			}
@@ -869,7 +1009,7 @@ public class PotionsPlus : BaseUnityPlugin
 			}
 
 			__result = false;
-			
+
 			GameObject hitObject = Projectile.FindHitObject(collider);
 			if (__instance.m_hitList.Contains(hitObject))
 			{
@@ -886,6 +1026,187 @@ public class PotionsPlus : BaseUnityPlugin
 			}
 
 			return false;
+		}
+	}
+
+	[HarmonyPatch(typeof(RandomSpeak), nameof(RandomSpeak.Start))]
+	private class PreventGhostFromTalking
+	{
+		private static bool Prefix(RandomSpeak __instance)
+		{
+			return __instance.gameObject.layer != Piece.ghostLayer;
+		}
+	}
+
+	[HarmonyPatch(typeof(Attack), nameof(Attack.Start))]
+	private class BypassAmmoCheck
+	{
+		private static void Prefix(Attack __instance, ItemDrop.ItemData weapon, ref string? __state)
+		{
+			if (weapon.m_dropPrefab?.name == "Odins_Dragon_Staff" && __instance.m_spawnOnTrigger?.name == "Staff_Smoke_Cloud")
+			{
+				__state = weapon.m_shared.m_ammoType;
+				weapon.m_shared.m_ammoType = "";
+			}
+		}
+
+		private static void Finalizer(ItemDrop.ItemData weapon, ref string? __state)
+		{
+			if (__state is not null)
+			{
+				weapon.m_shared.m_ammoType = __state;
+			}
+		}
+	}
+
+	[HarmonyPatch(typeof(Attack), nameof(Attack.UseAmmo))]
+	private class ReduceAmmoUsage
+	{
+		private static bool Prefix(Attack __instance, ref bool __result)
+		{
+			switch (__instance.m_weapon.m_dropPrefab?.name)
+			{
+				case "Odins_Dragon_Staff" when __instance.m_spawnOnTrigger?.name == "Staff_Smoke_Cloud":
+					__result = true;
+					return false;
+				case "Odins_Alchemy_Wand" or "Odins_Dragon_Staff" when __instance.m_character.m_helmetItem?.m_dropPrefab?.name == "Odins_Wizard_Hat":
+				{
+					if (__instance.m_character.GetInventory().GetAmmoItem(__instance.m_weapon.m_shared.m_ammoType) is not { } ammoItem)
+					{
+						return true;
+					}
+
+					if (Random.value < wizardHatConsumeChargeReduction.Value / 100f)
+					{
+						__instance.m_ammoItem = ammoItem;
+						__result = true;
+						return false;
+					}
+					break;
+				}
+			}
+
+			return true;
+		}
+	}
+
+	private class SmokescreenOwner : MonoBehaviour, IProjectile
+	{
+		public void Setup(Character owner, Vector3 velocity, float hitNoise, HitData hitData, ItemDrop.ItemData item)
+		{
+			ZDO zdo = GetComponent<ZNetView>().m_zdo;
+			zdo.Set("PotionsPlus SmokeCloud Owner", owner.GetZDOID());
+			zdo.Set("PotionsPlus SmokeCloud HatBonus", owner.GetComponent<VisEquipment>().m_currentHelmetItemHash == "Odins_Warlock_Hat".GetStableHashCode());
+		}
+
+		public void Start()
+		{
+			if (GetComponent<ZNetView>().m_zdo.GetBool("PotionsPlus SmokeCloud HatBonus"))
+			{
+				foreach (ParticleSystem particleSystem in GetComponentsInChildren<ParticleSystem>())
+				{
+					ParticleSystem.ShapeModule shape = particleSystem.shape;
+					shape.radius += warlockHatSmokeScreenSizeIncrease.Value;
+				}
+
+				GetComponentInChildren<SphereCollider>().radius += warlockHatSmokeScreenSizeIncrease.Value;
+
+				TimedDestruction destruction = GetComponent<TimedDestruction>();
+				destruction.CancelInvoke(nameof(TimedDestruction.DestroyNow));
+				destruction.Trigger(smokeScreenTTL.Value + warlockHatSmokeScreenDurationIncrease.Value);
+			}
+		}
+
+		public string GetTooltipString(int itemQuality) => "";
+	}
+
+	[HarmonyPatch(typeof(Projectile), nameof(Projectile.FixedUpdate))]
+	private class SmokescreenHitBarrier
+	{
+		private static int ProjectileBlocker(int mask)
+		{
+			return mask | 1 << LayerMask.NameToLayer("blocker");
+		}
+
+		private static IEnumerable<CodeInstruction> Transpiler(IEnumerable<CodeInstruction> instructions)
+		{
+			FieldInfo maskField = AccessTools.DeclaredField(typeof(Projectile), nameof(Projectile.m_rayMaskSolids));
+			foreach (CodeInstruction instruction in instructions)
+			{
+				yield return instruction;
+				if (instruction.opcode == OpCodes.Ldsfld && instruction.OperandIs(maskField))
+				{
+					yield return new CodeInstruction(OpCodes.Call, AccessTools.DeclaredMethod(typeof(SmokescreenHitBarrier), nameof(ProjectileBlocker)));
+				}
+			}
+		}
+	}
+
+	[HarmonyPatch(typeof(Projectile), nameof(Projectile.OnHit))]
+	private class DestroyBlockedProjectile
+	{
+		private static bool Prefix(Projectile __instance, Collider collider, ref bool __state)
+		{
+			if (__instance.m_stayAfterHitStatic && collider.gameObject.layer == LayerMask.NameToLayer("blocker") && collider.transform.parent?.GetComponent<ZNetView>()?.m_zdo is { } smokescreenZDO)
+			{
+				bool hitCharacter = false;
+				if (ZNetScene.instance.FindInstance(smokescreenZDO.GetZDOID("PotionsPlus SmokeCloud Owner"))?.GetComponent<Character>() is { } smokescreenOwner && !__instance.IsValidTarget(smokescreenOwner, ref hitCharacter))
+				{
+					return false;
+				}
+
+				__state = true;
+				Random.InitState((int)__instance.m_nview.m_zdo.m_uid.m_id);
+				Random.State state = Random.state;
+				bool blockIt = Random.value < (smokeScreenChanceToBlock.Value + (smokescreenZDO.GetBool("PotionsPlus SmokeCloud HatBonus") ? warlockHatSmokeScreenBlockIncrease.Value : 0)) / 100f;
+				Random.state = state;
+				
+				return blockIt;
+			}
+			return true;
+		}
+		
+		[HarmonyPriority(Priority.Low)]
+		private static void Postfix(Projectile __instance, Collider collider, bool __state)
+		{
+			if (__state && __instance.m_didHit)
+			{
+				ZNetScene.instance.Destroy(__instance.gameObject);
+			}
+		}
+	}
+	
+	[HarmonyPatch(typeof(Projectile), nameof(Projectile.SpawnOnHit))]
+	private class TransferDamageToAoeProjectile
+	{
+		private static IProjectile UpdateAoeProjectileDamage(IProjectile newProjectile, IProjectile spawning)
+		{
+			string projectileName = ((Component)spawning).name;
+			if (wandProjectiles.Any(p => projectileName.StartsWith(p, StringComparison.Ordinal)))
+			{
+				Aoe aoe = (Aoe)newProjectile;
+				Projectile projectile = (Projectile)spawning;
+				
+				aoe.m_damage.Add(projectile.m_damage);
+				aoe.m_attackForce += projectile.m_attackForce;
+				aoe.m_backstabBonus += projectile.m_backstabBonus;
+				aoe.m_statusEffect += projectile.m_statusEffect;
+			}
+			return newProjectile;
+		}
+
+		private static IEnumerable<CodeInstruction> Transpiler(IEnumerable<CodeInstruction> instructions)
+		{
+			MethodInfo projectile = AccessTools.DeclaredMethod(typeof(GameObject), nameof(GameObject.GetComponent), Array.Empty<Type>(), new []{ typeof(IProjectile) });
+			foreach (CodeInstruction instruction in instructions)
+			{
+				yield return instruction;
+				if (instruction.opcode == OpCodes.Callvirt && instruction.OperandIs(projectile))
+				{
+					yield return new CodeInstruction(OpCodes.Ldarg_0);
+					yield return new CodeInstruction(OpCodes.Call, AccessTools.DeclaredMethod(typeof(TransferDamageToAoeProjectile), nameof(UpdateAoeProjectileDamage)));
+				}
+			}
 		}
 	}
 }
