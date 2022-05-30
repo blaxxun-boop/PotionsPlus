@@ -23,7 +23,7 @@ namespace PotionsPlus;
 public class PotionsPlus : BaseUnityPlugin
 {
 	private const string ModName = "PotionsPlus";
-	private const string ModVersion = "4.1.0";
+	private const string ModVersion = "4.1.1";
 	private const string ModGUID = "com.odinplus.potionsplus";
 
 	private static readonly ConfigSync configSync = new(ModName) { DisplayName = ModName, CurrentVersion = ModVersion, MinimumRequiredVersion = ModVersion };
@@ -577,8 +577,10 @@ public class PotionsPlus : BaseUnityPlugin
 		Item alchemyEquipment = new(assets, "Odins_Alchemy_Wand");
 		alchemyEquipment.Crafting.Add(CraftingTable.Forge, 2);
 		alchemyEquipment.RequiredItems.Add("FineWood", 8);
+		alchemyEquipment.RequiredItems.Add("Copper", 3);
 		alchemyEquipment.RequiredItems.Add("SurtlingCore", 1);
-		alchemyEquipment.RequiredItems.Add("Copper", 1);
+		alchemyEquipment.RequiredUpgradeItems.Add("FineWood", 4);
+		alchemyEquipment.RequiredUpgradeItems.Add("Copper", 1);
 
 		alchemyEquipment = new Item(assets, "Odins_Wizard_Hat");
 		alchemyEquipment.Crafting.Add(CraftingTable.Workbench, 5);
@@ -1147,7 +1149,7 @@ public class PotionsPlus : BaseUnityPlugin
 	{
 		private static bool Prefix(Projectile __instance, Collider collider, ref bool __state)
 		{
-			if (__instance.m_stayAfterHitStatic && collider.gameObject.layer == LayerMask.NameToLayer("blocker") && collider.transform.parent?.GetComponent<ZNetView>()?.m_zdo is { } smokescreenZDO)
+			if (collider && collider.gameObject.layer == LayerMask.NameToLayer("blocker") && collider.transform.parent?.GetComponent<ZNetView>()?.m_zdo is { } smokescreenZDO)
 			{
 				bool hitCharacter = false;
 				if (ZNetScene.instance.FindInstance(smokescreenZDO.GetZDOID("PotionsPlus SmokeCloud Owner"))?.GetComponent<Character>() is { } smokescreenOwner && !__instance.IsValidTarget(smokescreenOwner, ref hitCharacter))
@@ -1169,7 +1171,7 @@ public class PotionsPlus : BaseUnityPlugin
 		[HarmonyPriority(Priority.Low)]
 		private static void Postfix(Projectile __instance, Collider collider, bool __state)
 		{
-			if (__state && __instance.m_didHit)
+			if (__state && __instance.m_didHit && __instance.m_stayAfterHitStatic)
 			{
 				ZNetScene.instance.Destroy(__instance.gameObject);
 			}
