@@ -400,7 +400,7 @@ public class PotionsPlus : BaseUnityPlugin
 		Item potion = new(assets, "Potion_Meadbase");
 		potion.Crafting.Add("opalchemy", 2);
 		potion.RequiredItems.Add("Honey", 2);
-		potion.RequiredItems.Add("YmirRemains", 4);
+		potion.RequiredItems.Add("YmirRemains", 1);
 
 		potion = new Item(assets, "Flask_of_Elements");
 		potion.Crafting.Add("opalchemy", 1);
@@ -633,18 +633,25 @@ public class PotionsPlus : BaseUnityPlugin
 		potion.RequiredItems.Add("Resin", 8);
 		potion.RequiredItems.Add("Torch", 1);
 
+		potion = new Item(assets, "Hellbroth_of_Flames_Charge");
+		potion.Crafting.Add("opcauldron", 1);
+		potion.RequiredItems.Add("Hellbroth_of_Flames", 3);
+
 		Aoe fireAoe = PrefabManager.RegisterPrefab(assets, "Hellbroth_Explosion").GetComponent<Aoe>();
 		fireAoe.m_damage.m_fire = hellbrothOfFlamesDamage.Value;
 		hellbrothOfFlamesDamage.SettingChanged += (_, _) => fireAoe.m_damage.m_fire = hellbrothOfFlamesDamage.Value;
 		PrefabManager.RegisterPrefab(assets, "Hellbroth_Projectile");
 		PrefabManager.RegisterPrefab(assets, "Hellbroth_Orb_Projectile");
 		wandProjectiles.Add("Hellbroth_Orb_Projectile");
-		PrefabManager.RegisterPrefab(assets, "Hellbroth_of_Flames_Charge");
 
 		potion = new Item(assets, "Hellbroth_of_Frost");
 		potion.Crafting.Add("opalchemy", 2);
 		potion.RequiredItems.Add("FreezeGland", 4);
 		potion.RequiredItems.Add("Chain", 1);
+
+		potion = new Item(assets, "Hellbroth_of_Frost_Charge");
+		potion.Crafting.Add("opcauldron", 1);
+		potion.RequiredItems.Add("Hellbroth_of_Frost", 3);
 
 		Aoe frostAoe = PrefabManager.RegisterPrefab(assets, "Hellbroth_Frost_Explosion").GetComponent<Aoe>();
 		frostAoe.m_damage.m_frost = hellbrothOfFrostDamage.Value;
@@ -652,18 +659,20 @@ public class PotionsPlus : BaseUnityPlugin
 		PrefabManager.RegisterPrefab(assets, "Hellbroth_Frost_Projectile");
 		PrefabManager.RegisterPrefab(assets, "Hellbroth_Frost_Orb_Projectile");
 		wandProjectiles.Add("Hellbroth_Frost_Orb_Projectile");
-		PrefabManager.RegisterPrefab(assets, "Hellbroth_of_Frost_Charge");
 
 		potion = new Item(assets, "Hellbroth_of_Thors_Fury");
 		potion.Crafting.Add("opalchemy", 2);
 		potion.RequiredItems.Add("Tar", 6);
 		potion.RequiredItems.Add("Thunderstone", 1);
 
+		potion = new Item(assets, "Hellbroth_of_Thors_Fury_Charge");
+		potion.Crafting.Add("opcauldron", 1);
+		potion.RequiredItems.Add("Hellbroth_of_Thors_Fury", 3);
+
 		Aoe lightningAoe = PrefabManager.RegisterPrefab(assets, "Hellbroth_Thors_Fury_Explosion").GetComponent<Aoe>();
 		lightningAoe.m_damage.m_lightning = hellbrothOfThorsFuryDamage.Value;
 		hellbrothOfThorsFuryDamage.SettingChanged += (_, _) => lightningAoe.m_damage.m_lightning = hellbrothOfThorsFuryDamage.Value;
 		PrefabManager.RegisterPrefab(assets, "Hellbroth_Thors_Fury_Projectile");
-		PrefabManager.RegisterPrefab(assets, "Hellbroth_of_Thors_Fury_Charge");
 		PrefabManager.RegisterPrefab(assets, "Hellbroth_Thors_Fury_Orb_Projectile");
 		wandProjectiles.Add("Hellbroth_Thors_Fury_Orb_Projectile");
 
@@ -671,11 +680,15 @@ public class PotionsPlus : BaseUnityPlugin
 		potion.Crafting.Add("opalchemy", 2);
 		potion.RequiredItems.Add("Honey", 5);
 		potion.RequiredItems.Add("Dandelion", 3);
+
+		potion = new Item(assets, "Hellbroth_of_Eternal_Life_Charge");
+		potion.Crafting.Add("opcauldron", 1);
+		potion.RequiredItems.Add("Hellbroth_of_Eternal_Life", 3);
+
 		PrefabManager.RegisterPrefab(assets, "Hellbroth_Life_Projectile");
 		PrefabManager.RegisterPrefab(assets, "Hellbroth_Life_Explostion");
 		PrefabManager.RegisterPrefab(assets, "Hellbroth_Life_Orb_Projectile");
 		wandProjectiles.Add("Hellbroth_Life_Orb_Projectile");
-		PrefabManager.RegisterPrefab(assets, "Hellbroth_of_Eternal_Life_Charge");
 
 		potion = new Item(assets, "Lesser_Group_Healing");
 		if (API.IsLoaded())
@@ -803,7 +816,25 @@ public class PotionsPlus : BaseUnityPlugin
 		}
 		ConvertConsumeSEStats<ManaPotion>(potion.Prefab).manaToRestore = 99999999;
 		SEValue(potion, (effect, value) => effect.m_ttl = value, overflowingManaPotionCooldown);
-		
+
+		potion = new Item(assets, "PhilosopherStoneBlue");
+		potion.Crafting.Add("opcauldron", 1);
+		potion.RequiredItems.Add("Flask_of_Elements", 5);
+
+		potion = new Item(assets, "PhilosopherStoneRed");
+		potion.Crafting.Add("opcauldron", 1);
+		potion.RequiredItems.Add("Flask_of_the_Gods", 5);
+
+		potion = new Item(assets, "PhilosopherStonePurple");
+		potion.Crafting.Add("opcauldron", 1);
+		potion.RequiredItems.Add("Flask_of_Second_Wind", 5);
+
+		potion = new Item(assets, "PhilosopherStoneGreen");
+		potion.Crafting.Add("opcauldron", 1);
+		potion.RequiredItems.Add("Flask_of_Fortification", 5);
+
+
+
 		void AddStatusEffectModifier(Item item)
 		{
 			SE_Stats statusEffect = (SE_Stats)item.Prefab.GetComponent<ItemDrop>().m_itemData.m_shared.m_equipStatusEffect;

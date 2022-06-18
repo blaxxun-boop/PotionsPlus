@@ -46,9 +46,9 @@
         <GamePath Condition="!Exists('$(GamePath)')">$([MSBuild]::GetRegistryValueFromView('HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\Steam App 892970', 'InstallLocation', null, RegistryView.Registry64, RegistryView.Registry32))</GamePath>
         <_SteamLibraryPath>$([MSBuild]::GetRegistryValueFromView('HKEY_CURRENT_USER\SOFTWARE\Valve\Steam', 'SteamPath', null, RegistryView.Registry32))</_SteamLibraryPath>
         <GamePath Condition="!Exists('$(GamePath)') AND '$(_SteamLibraryPath)' != ''">$(_SteamLibraryPath)\steamapps\common\Valheim</GamePath>
-        <GamePath Condition="!Exists('$(GamePath)')">C:\Program Files\Steam\steamapps\common\Valheim</GamePath>
-        <GamePath Condition="!Exists('$(GamePath)')">C:\Program Files (x86)\Steam\steamapps\common\Valheim</GamePath>
-        <GamePath Condition="!Exists('$(GamePath)')">E:\Steam\steamapps\common\ValheimLATEST</GamePath>
+        <GamePath Condition="!Exists('$(GamePath)')">D:\steamapps\common\Valheim</GamePath>
+        <GamePath Condition="!Exists('$(GamePath)')">D:\Steam\steamapps\common\Valheim</GamePath>
+        <GamePath Condition="!Exists('$(GamePath)')">D:\Steam\steamapps\common\ValheimLATEST</GamePath>
       </PropertyGroup>
     </When>
   </Choose>
@@ -57,14 +57,17 @@
       <HintPath>$(GamePath)\BepInEx\core\0Harmony.dll</HintPath>
       <SpecificVersion>false</SpecificVersion>
     </Reference>
-    <Reference Include="assembly_guiutils, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
-      <HintPath>$(GamePath)\valheim_Data\Managed\publicized_assemblies\assembly_guiutils_publicized.dll</HintPath>
+    <Reference Include="assembly_guiutils_publicized, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>D:\RiderRepos\GodBow\GodBow\references\assembly_guiutils_publicized.dll</HintPath>
     </Reference>
-    <Reference Include="assembly_utils, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
-      <HintPath>$(GamePath)\valheim_Data\Managed\publicized_assemblies\assembly_utils_publicized.dll</HintPath>
+    <Reference Include="assembly_utils_publicized, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>D:\Steam\steamapps\common\ValheimLATEST\valheim_Data\Managed\publicized_assemblies\assembly_utils_publicized.dll</HintPath>
     </Reference>
-    <Reference Include="assembly_valheim, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
-      <HintPath>$(GamePath)\valheim_Data\Managed\publicized_assemblies\assembly_valheim_publicized.dll</HintPath>
+    <Reference Include="assembly_valheim_publicized, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>Refs\assembly_valheim_publicized.dll</HintPath>
     </Reference>
     <Reference Include="BepInEx, Version=5.4.19.0, Culture=neutral, PublicKeyToken=null">
       <HintPath>$(GamePath)\BepInEx\core\BepInEx.dll</HintPath>
@@ -81,9 +84,6 @@
     </Reference>
     <Reference Include="PieceManager">
       <HintPath>Libs\PieceManager.dll</HintPath>
-    </Reference>
-    <Reference Include="ServerSync">
-      <HintPath>Libs\ServerSync.dll</HintPath>
     </Reference>
     <Reference Include="ServerSync, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null">
       <HintPath>ServerSync.dll</HintPath>
