@@ -11,6 +11,7 @@ public class ManaPotion : SE_Stats
 		if (character == Player.m_localPlayer)
 		{
 			MO_API.SetMana(MO_API.GetMana() + manaToRestore);
+			MO_API.UseMana(0);
 		}
 	}
 }
