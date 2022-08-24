@@ -70,6 +70,9 @@
       <HintPath>$(GamePath)\BepInEx\core\BepInEx.dll</HintPath>
       <SpecificVersion>false</SpecificVersion>
     </Reference>
+    <Reference Include="ExtendedItemDataFramework">
+      <HintPath>$(GamePath)\BepInEx\plugins\ExtendedItemDataFramework.dll</HintPath>
+    </Reference>
     <Reference Include="Groups">
       <HintPath>$(GamePath)\BepInEx\plugins\Groups.dll</HintPath>
     </Reference>
@@ -98,17 +101,35 @@
     <Reference Include="UnityEngine, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
       <HintPath>$(GamePath)\unstripped_corlib\UnityEngine.dll</HintPath>
     </Reference>
+    <Reference Include="UnityEngine.AnimationModule">
+      <HintPath>$(GamePath)\unstripped_corlib\UnityEngine.AnimationModule.dll</HintPath>
+    </Reference>
     <Reference Include="UnityEngine.AssetBundleModule">
       <HintPath>$(GamePath)\unstripped_corlib\UnityEngine.AssetBundleModule.dll</HintPath>
     </Reference>
     <Reference Include="UnityEngine.CoreModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
       <HintPath>$(GamePath)\unstripped_corlib\UnityEngine.CoreModule.dll</HintPath>
     </Reference>
+    <Reference Include="UnityEngine.IMGUIModule">
+      <HintPath>$(GamePath)\unstripped_corlib\UnityEngine.IMGUIModule.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine.InputLegacyModule">
+      <HintPath>$(GamePath)\valheim_Data\Managed\UnityEngine.InputLegacyModule.dll</HintPath>
+    </Reference>
     <Reference Include="UnityEngine.ParticleSystemModule">
       <HintPath>$(GamePath)\unstripped_corlib\UnityEngine.ParticleSystemModule.dll</HintPath>
     </Reference>
     <Reference Include="UnityEngine.PhysicsModule">
       <HintPath>$(GamePath)\unstripped_corlib\UnityEngine.PhysicsModule.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine.TextRenderingModule">
+      <HintPath>$(GamePath)\unstripped_corlib\UnityEngine.TextRenderingModule.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine.UI">
+      <HintPath>$(GamePath)\valheim_Data\Managed\UnityEngine.UI.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine.UIModule">
+      <HintPath>$(GamePath)\valheim_Data\Managed\UnityEngine.UIModule.dll</HintPath>
     </Reference>
     <Reference Include="YamlDotNet, Version=11.0.0.0, Culture=neutral, PublicKeyToken=ec19458f3c15af5e, processorArchitecture=MSIL">
       <HintPath>..\packages\YamlDotNet.11.2.1\lib\net45\YamlDotNet.dll</HintPath>
@@ -121,6 +142,13 @@
     <Compile Include="MO_API.cs" />
     <Compile Include="PotionsPlus.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Setup\BuildingPiecesSetup.cs" />
+    <Compile Include="Setup\EquipmentSetup.cs" />
+    <Compile Include="Setup\GroupPotionSetup.cs" />
+    <Compile Include="Setup\HellbrothSetup.cs" />
+    <Compile Include="Setup\ManaPotionSetup.cs" />
+    <Compile Include="Setup\PotionsSetup.cs" />
+    <Compile Include="Utils.cs" />
     <Compile Include="WeaponOil.cs" />
   </ItemGroup>
   <ItemGroup>

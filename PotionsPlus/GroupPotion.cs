@@ -18,7 +18,7 @@ public class GroupPotion : SE_Stats
 			foreach (PlayerReference groupPlayer in API.GroupPlayers().Where(p => p != PlayerReference.fromPlayer(Player.m_localPlayer)))
 			{
 				Vector3 groupPlayerPos = ZNet.m_instance.m_players.FirstOrDefault(p => p.m_characterID.m_userID == groupPlayer.peerId).m_position;
-				if (range == 0 || Utils.DistanceXZ(character.transform.position, groupPlayerPos) < range)
+				if (range == 0 || global::Utils.DistanceXZ(character.transform.position, groupPlayerPos) < range)
 				{
 					ZRoutedRpc.instance.InvokeRoutedRPC(groupPlayer.peerId, "PotionsPlus Potion Activated", name);
 				}

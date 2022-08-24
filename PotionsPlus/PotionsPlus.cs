@@ -5,10 +5,8 @@ using System.Reflection;
 using System.Reflection.Emit;
 using BepInEx;
 using BepInEx.Configuration;
-using Groups;
 using HarmonyLib;
 using ItemManager;
-using PieceManager;
 using ServerSync;
 using SkillManager;
 using UnityEngine;
@@ -23,12 +21,12 @@ namespace PotionsPlus;
 public class PotionsPlus : BaseUnityPlugin
 {
 	private const string ModName = "PotionsPlus";
-	private const string ModVersion = "4.1.1";
+	private const string ModVersion = "4.1.2";
 	private const string ModGUID = "com.odinplus.potionsplus";
 
 	private static readonly ConfigSync configSync = new(ModName) { DisplayName = ModName, CurrentVersion = ModVersion, MinimumRequiredVersion = ModVersion };
 
-	private static readonly HashSet<string> wandProjectiles = new();
+	public static readonly HashSet<string> wandProjectiles = new();
 
 	private static ConfigEntry<Toggle> serverConfigLocked = null!;
 	private static ConfigEntry<float> philosophersStoneXpGainFactor = null!;
@@ -37,122 +35,122 @@ public class PotionsPlus : BaseUnityPlugin
 	// Flask of Elements
 	public static ConfigEntry<int> flaskOfElementsFireDamageTakenReduction = null!;
 	public static ConfigEntry<int> flaskOfElementsLightningDamageTakenReduction = null!;
-	private static ConfigEntry<int> flaskOfElementsTTL = null!;
+	public static ConfigEntry<int> flaskOfElementsTTL = null!;
 	// Flask of Fortification
 	public static ConfigEntry<int> flaskOfFortificationBluntDamageTakenReduction = null!;
 	public static ConfigEntry<int> flaskOfFortificationSlashDamageTakenReduction = null!;
 	public static ConfigEntry<int> flaskOfFortificationPierceDamageTakenReduction = null!;
-	private static ConfigEntry<int> flaskOfFortificationTTL = null!;
+	public static ConfigEntry<int> flaskOfFortificationTTL = null!;
 	// Flask of Magelight
-	private static ConfigEntry<float> flaskOfMagelightIntensity = null!;
-	private static ConfigEntry<Color> flaskOfMagelightColor = null!;
-	private static ConfigEntry<int> flaskOfMagelightTTL = null!;
+	public static ConfigEntry<float> flaskOfMagelightIntensity = null!;
+	public static ConfigEntry<Color> flaskOfMagelightColor = null!;
+	public static ConfigEntry<int> flaskOfMagelightTTL = null!;
 	// Flask of the Gods
-	private static ConfigEntry<float> flaskOfGodsHealing = null!;
-	private static ConfigEntry<float> flaskOfGodsRegenMultiplier = null!;
-	private static ConfigEntry<int> flaskOfGodsTTL = null!;
+	public static ConfigEntry<float> flaskOfGodsHealing = null!;
+	public static ConfigEntry<float> flaskOfGodsRegenMultiplier = null!;
+	public static ConfigEntry<int> flaskOfGodsTTL = null!;
 	// Flask of Second Wind
-	private static ConfigEntry<float> flaskOfSecondWindJumpStaminaFactor = null!;
-	private static ConfigEntry<float> flaskOfSecondWindRunStaminaFactor = null!;
-	private static ConfigEntry<float> flaskOfSecondWindStaminaRegenMultiplier = null!;
-	private static ConfigEntry<int> flaskOfSecondWindTTL = null!;
+	public static ConfigEntry<float> flaskOfSecondWindJumpStaminaFactor = null!;
+	public static ConfigEntry<float> flaskOfSecondWindRunStaminaFactor = null!;
+	public static ConfigEntry<float> flaskOfSecondWindStaminaRegenMultiplier = null!;
+	public static ConfigEntry<int> flaskOfSecondWindTTL = null!;
 	// Grand Healing Tide Potion
-	private static ConfigEntry<float> grandHealingTidePotionHealthOverTime = null!;
-	private static ConfigEntry<float> grandHealingTidePotionTickInterval = null!;
-	private static ConfigEntry<float> grandHealingTidePotionTTL = null!;
+	public static ConfigEntry<float> grandHealingTidePotionHealthOverTime = null!;
+	public static ConfigEntry<float> grandHealingTidePotionTickInterval = null!;
+	public static ConfigEntry<float> grandHealingTidePotionTTL = null!;
 	// Grand Spiritual Healing Potion
-	private static ConfigEntry<float> grandSpiritualHealingPotionHealthOverTime = null!;
-	private static ConfigEntry<int> grandSpiritualHealingPotionCooldown = null!;
+	public static ConfigEntry<float> grandSpiritualHealingPotionHealthOverTime = null!;
+	public static ConfigEntry<int> grandSpiritualHealingPotionCooldown = null!;
 	// Grand Stamina Elixir
-	private static ConfigEntry<float> grandStaminaElixirStaminaOverTime = null!;
-	private static ConfigEntry<float> grandStaminaElixirTTL = null!;
-	private static ConfigEntry<int> grandStaminaElixirCooldown = null!;
+	public static ConfigEntry<float> grandStaminaElixirStaminaOverTime = null!;
+	public static ConfigEntry<float> grandStaminaElixirTTL = null!;
+	public static ConfigEntry<int> grandStaminaElixirCooldown = null!;
 	// Grand Stealth Elixir
-	private static ConfigEntry<int> grandStealthElixirNoiseReduction = null!;
-	private static ConfigEntry<int> grandStealthElixirVisibilityReduction = null!;
-	private static ConfigEntry<int> grandStealthElixirTTL = null!;
+	public static ConfigEntry<int> grandStealthElixirNoiseReduction = null!;
+	public static ConfigEntry<int> grandStealthElixirVisibilityReduction = null!;
+	public static ConfigEntry<int> grandStealthElixirTTL = null!;
 	// Medium Healing Tide Flask
-	private static ConfigEntry<float> mediumHealingTideFlaskHealthOverTime = null!;
-	private static ConfigEntry<float> mediumHealingTideFlaskTickInterval = null!;
-	private static ConfigEntry<float> mediumHealingTideFlaskTTL = null!;
-	private static ConfigEntry<int> mediumHealingTideFlaskCooldown = null!;
+	public static ConfigEntry<float> mediumHealingTideFlaskHealthOverTime = null!;
+	public static ConfigEntry<float> mediumHealingTideFlaskTickInterval = null!;
+	public static ConfigEntry<float> mediumHealingTideFlaskTTL = null!;
+	public static ConfigEntry<int> mediumHealingTideFlaskCooldown = null!;
 	// Medium Spiritual Healing Flask
-	private static ConfigEntry<float> mediumSpiritualHealingFlaskHealthOverTime = null!;
-	private static ConfigEntry<int> mediumSpiritualHealingFlaskCooldown = null!;
+	public static ConfigEntry<float> mediumSpiritualHealingFlaskHealthOverTime = null!;
+	public static ConfigEntry<int> mediumSpiritualHealingFlaskCooldown = null!;
 	// Medium Stamina Flask
-	private static ConfigEntry<float> mediumStaminaFlaskStaminaOverTime = null!;
-	private static ConfigEntry<int> mediumStaminaFlaskCooldown = null!;
+	public static ConfigEntry<float> mediumStaminaFlaskStaminaOverTime = null!;
+	public static ConfigEntry<int> mediumStaminaFlaskCooldown = null!;
 	// Lesser Healing Tide Vial
-	private static ConfigEntry<float> lesserHealingTideVialHealthOverTime = null!;
-	private static ConfigEntry<float> lesserHealingTideVialTickInterval = null!;
-	private static ConfigEntry<float> lesserHealingTideVialTTL = null!;
-	private static ConfigEntry<int> lesserHealingTideVialCooldown = null!;
+	public static ConfigEntry<float> lesserHealingTideVialHealthOverTime = null!;
+	public static ConfigEntry<float> lesserHealingTideVialTickInterval = null!;
+	public static ConfigEntry<float> lesserHealingTideVialTTL = null!;
+	public static ConfigEntry<int> lesserHealingTideVialCooldown = null!;
 	// Lesser Spiritual Healing Vial
-	private static ConfigEntry<float> lesserSpiritualHealingVialHealthOverTime = null!;
-	private static ConfigEntry<int> lesserSpiritualHealingVialCooldown = null!;
+	public static ConfigEntry<float> lesserSpiritualHealingVialHealthOverTime = null!;
+	public static ConfigEntry<int> lesserSpiritualHealingVialCooldown = null!;
 	// Lesser Stamina Vial
-	private static ConfigEntry<float> lesserStaminaVialStaminaOverTime = null!;
-	private static ConfigEntry<int> lesserStaminaVialCooldown = null!;
+	public static ConfigEntry<float> lesserStaminaVialStaminaOverTime = null!;
+	public static ConfigEntry<int> lesserStaminaVialCooldown = null!;
 	// Hellbroth of Flames
-	private static ConfigEntry<float> hellbrothOfFlamesDamage = null!;
+	public static ConfigEntry<float> hellbrothOfFlamesDamage = null!;
 	// Hellbroth of Frost
-	private static ConfigEntry<float> hellbrothOfFrostDamage = null!;
+	public static ConfigEntry<float> hellbrothOfFrostDamage = null!;
 	// Hellbroth of Thors Fury
-	private static ConfigEntry<float> hellbrothOfThorsFuryDamage = null!;
+	public static ConfigEntry<float> hellbrothOfThorsFuryDamage = null!;
 	// Hellbroth of Eternal Life
 	private static ConfigEntry<float> hellbrothOfEternalLifeHealing = null!;
 	// Brew of Faint Group Healing
-	private static ConfigEntry<float> brewOfFaintGroupHealingHealthOverTime = null!;
-	private static ConfigEntry<int> brewOfFaintGroupHealingCooldown = null!;
+	public static ConfigEntry<float> brewOfFaintGroupHealingHealthOverTime = null!;
+	public static ConfigEntry<int> brewOfFaintGroupHealingCooldown = null!;
 	private static ConfigEntry<int> brewOfFaintGroupHealingRange = null!;
 	// Brew of Group Healing
-	private static ConfigEntry<float> brewOfGroupHealingHealthOverTime = null!;
-	private static ConfigEntry<int> brewOfGroupHealingCooldown = null!;
+	public static ConfigEntry<float> brewOfGroupHealingHealthOverTime = null!;
+	public static ConfigEntry<int> brewOfGroupHealingCooldown = null!;
 	private static ConfigEntry<int> brewOfGroupHealingRange = null!;
 	// Brew of Grand Group Healing
-	private static ConfigEntry<float> brewOfGrandGroupHealingHealthOverTime = null!;
-	private static ConfigEntry<int> brewOfGrandGroupHealingCooldown = null!;
+	public static ConfigEntry<float> brewOfGrandGroupHealingHealthOverTime = null!;
+	public static ConfigEntry<int> brewOfGrandGroupHealingCooldown = null!;
 	private static ConfigEntry<int> brewOfGrandGroupHealingRange = null!;
 	// Brew of Fiery Revenge
-	private static ConfigEntry<float> brewOfFieryRevengeTTL = null!;
-	private static ConfigEntry<int> brewOfFieryRevengeRange = null!;
+	public static ConfigEntry<float> brewOfFieryRevengeTTL = null!;
+	public static ConfigEntry<int> brewOfFieryRevengeRange = null!;
 	// Brew of the Icy Touch
-	private static ConfigEntry<float> brewOfIcyTouchTTL = null!;
-	private static ConfigEntry<int> brewOfIcyTouchRange = null!;
+	public static ConfigEntry<float> brewOfIcyTouchTTL = null!;
+	public static ConfigEntry<int> brewOfIcyTouchRange = null!;
 	// Brew of Cunning Toxicity
-	private static ConfigEntry<float> brewOfCunningToxicityTTL = null!;
-	private static ConfigEntry<int> brewOfCunningToxicityRange = null!;
+	public static ConfigEntry<float> brewOfCunningToxicityTTL = null!;
+	public static ConfigEntry<int> brewOfCunningToxicityRange = null!;
 	// Brew of Spiritual Death
-	private static ConfigEntry<float> brewOfSpiritualDeathTTL = null!;
-	private static ConfigEntry<int> brewOfSpiritualDeathRange = null!;
+	public static ConfigEntry<float> brewOfSpiritualDeathTTL = null!;
+	public static ConfigEntry<int> brewOfSpiritualDeathRange = null!;
 	// Brew of Thunderous Words
-	private static ConfigEntry<float> brewOfThunderousWordsTTL = null!;
-	private static ConfigEntry<int> brewOfThunderousWordsRange = null!;
+	public static ConfigEntry<float> brewOfThunderousWordsTTL = null!;
+	public static ConfigEntry<int> brewOfThunderousWordsRange = null!;
 	// Odins Wizard Hat
 	private static ConfigEntry<float> wizardHatConsumeChargeReduction = null!;
-	private static ConfigEntry<int> wizardHatBaseArmor = null!;
-	private static ConfigEntry<int> wizardHatArmorPerUpgrade = null!;
+	public static ConfigEntry<int> wizardHatBaseArmor = null!;
+	public static ConfigEntry<int> wizardHatArmorPerUpgrade = null!;
 	// Odins Warlock Hat
 	private static ConfigEntry<float> warlockHatSmokeScreenSizeIncrease = null!;
 	private static ConfigEntry<int> warlockHatSmokeScreenBlockIncrease = null!;
 	private static ConfigEntry<int> warlockHatSmokeScreenDurationIncrease = null!;
-	private static ConfigEntry<int> warlockHatBaseArmor = null!;
-	private static ConfigEntry<int> warlockHatArmorPerUpgrade = null!;
+	public static ConfigEntry<int> warlockHatBaseArmor = null!;
+	public static ConfigEntry<int> warlockHatArmorPerUpgrade = null!;
 	// Odins Weapon Oil
 	public static ConfigEntry<int> weaponOilDamageIncrease = null!;
-	private static ConfigEntry<float> weaponOilTTL = null!;
+	public static ConfigEntry<float> weaponOilTTL = null!;
 	// Odins Dragon Staff
 	private static ConfigEntry<int> smokeScreenChanceToBlock = null!;
-	private static ConfigEntry<float> smokeScreenTTL = null!;
+	public static ConfigEntry<float> smokeScreenTTL = null!;
 	// Weak Mana Potion
-	private static ConfigEntry<int> weakManaPotionManaRestoration = null!;
-	private static ConfigEntry<int> weakManaPotionCooldown = null!;
+	public static ConfigEntry<int> weakManaPotionManaRestoration = null!;
+	public static ConfigEntry<int> weakManaPotionCooldown = null!;
 	// Giant Mana Potion
-	private static ConfigEntry<int> giantManaPotionManaRestoration = null!;
-	private static ConfigEntry<int> giantManaPotionCooldown = null!;
+	public static ConfigEntry<int> giantManaPotionManaRestoration = null!;
+	public static ConfigEntry<int> giantManaPotionCooldown = null!;
 	// Overflowing Mana Potion
-	private static ConfigEntry<int> overflowingManaPotionCooldown = null!;
-	
+	public static ConfigEntry<int> overflowingManaPotionCooldown = null!;
+
 	private ConfigEntry<T> config<T>(string group, string name, T value, ConfigDescription description, bool synchronizedSetting = true)
 	{
 		ConfigEntry<T> configEntry = Config.Bind(group, name, value, description);
@@ -224,7 +222,7 @@ public class PotionsPlus : BaseUnityPlugin
 		grandSpiritualHealingPotionCooldown = config("Grand Spiritual Healing Potion", "Cooldown Duration", 240, new ConfigDescription("Cooldown of the Grand Spiritual Healing Potion in seconds.", new AcceptableValueRange<int>(1, 600)));
 		// Grand Stealth Elixir
 		grandStealthElixirVisibilityReduction = config("Grand Stealth Elixir", "Visibility Reduction", 100, new ConfigDescription("Visibility reduction while sneaking during the Grand Stealth Elixir effect.", new AcceptableValueRange<int>(0, 100)));
-		grandStealthElixirNoiseReduction = config("Grand Stealth Elixir", "Noise Reduction", 100, new ConfigDescription("Noise reudction while sneaking during the Grand Stealth Elixir effect.", new AcceptableValueRange<int>(0, 100)));
+		grandStealthElixirNoiseReduction = config("Grand Stealth Elixir", "Noise Reduction", 100, new ConfigDescription("Noise reduction while sneaking during the Grand Stealth Elixir effect.", new AcceptableValueRange<int>(0, 100)));
 		grandStealthElixirTTL = config("Grand Stealth Elixir", "Effect Duration", 60, new ConfigDescription("Effect duration of the Grand Stealth Elixir effect in seconds.", new AcceptableValueRange<int>(5, 900)));
 		// Medium Healing Tide Flask
 		mediumHealingTideFlaskHealthOverTime = config("Medium Healing Tide Flask", "Healing Effect", 45f, new ConfigDescription("Healing from the Medium Healing Tide Flask effect."));
@@ -307,7 +305,14 @@ public class PotionsPlus : BaseUnityPlugin
 		giantManaPotionCooldown = config("Giant Mana Potion", "Cooldown Duration", 180, new ConfigDescription("Cooldown of the Giant Mana Potion in seconds.", new AcceptableValueRange<int>(5, 900)));
 		// Overflowing Mana Potion
 		overflowingManaPotionCooldown = config("Overflowing Mana Potion", "Cooldown Duration", 300, new ConfigDescription("Cooldown of the Overflowing Mana Potion in seconds.", new AcceptableValueRange<int>(5, 900)));
-		
+
+		BuildingPiecesSetup.initializeBuildingPieces(assets);
+		PotionsSetup.initializePotions(assets);
+		EquipmentSetup.initializeEquipment(assets);
+		GroupPotionSetup.initializeGroupPotions(assets);
+		ManaPotionSetup.initializeManaPotions(assets);
+		HellbrothSetup.initializeHellbroth(assets);
+
 		Localizer.AddPlaceholder("pp_flask_elements_description", "duration", flaskOfElementsTTL, ttl => (ttl / 60f).ToString("0.#"));
 		Localizer.AddPlaceholder("pp_flask_secondwind_description", "duration", flaskOfSecondWindTTL, ttl => (ttl / 60f).ToString("0.#"));
 		Localizer.AddPlaceholder("pp_flask_fort_description", "duration", flaskOfFortificationTTL, ttl => (ttl / 60f).ToString("0.#"));
@@ -357,453 +362,6 @@ public class PotionsPlus : BaseUnityPlugin
 		Harmony harmony = new(ModGUID);
 		harmony.PatchAll(assembly);
 
-		void ItemValue<T>(Item item, Action<ItemDrop.ItemData.SharedData, T> setter, ConfigEntry<T> config)
-		{
-			string itemName = item.Prefab.GetComponent<ItemDrop>().m_itemData.m_shared.m_name;
-			void set() => setter(item.Prefab.GetComponent<ItemDrop>().m_itemData.m_shared, config.Value);
-			config.SettingChanged += (_, _) =>
-			{
-				if (ObjectDB.instance)
-				{
-					Inventory[] inventories = Player.m_players.Select(p => p.GetInventory()).Concat(FindObjectsOfType<Container>().Select(c => c.GetInventory())).ToArray();
-					foreach (ItemDrop.ItemData itemdata in ObjectDB.instance.m_items.Select(p => p.GetComponent<ItemDrop>()).Where(c => c && c.GetComponent<ZNetView>()).Concat(ItemDrop.m_instances).Select(i => i.m_itemData).Concat(inventories.SelectMany(i => i.GetAllItems())))
-					{
-						if (itemName == itemdata.m_shared.m_name)
-						{
-							setter(itemdata.m_shared, config.Value);
-						}
-					}
-				}
-				set();
-			};
-			set();
-		}
-
-		void SEValue<T>(Item potion, Action<SE_Stats, T> setter, ConfigEntry<T> config) => ItemValue(potion, (i, c) => setter((SE_Stats)i.m_consumeStatusEffect, c), config);
-
-		T ConvertConsumeSEStats<T>(GameObject item) where T : StatusEffect
-		{
-			ItemDrop.ItemData.SharedData shared = item.GetComponent<ItemDrop>().m_itemData.m_shared;
-			StatusEffect stats = shared.m_consumeStatusEffect;
-			T ownSE = ScriptableObject.CreateInstance<T>();
-			shared.m_consumeStatusEffect = ownSE;
-
-			ownSE.name = stats.name;
-			foreach (FieldInfo field in stats.GetType().GetFields(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic))
-			{
-				field.SetValue(ownSE, field.GetValue(stats));
-			}
-
-			return ownSE;
-		}
-
-		Item potion = new(assets, "Potion_Meadbase");
-		potion.Crafting.Add("opalchemy", 2);
-		potion.RequiredItems.Add("Honey", 2);
-		potion.RequiredItems.Add("YmirRemains", 4);
-
-		potion = new Item(assets, "Flask_of_Elements");
-		potion.Crafting.Add("opalchemy", 1);
-		potion.RequiredItems.Add("Potion_Meadbase", 1);
-		potion.RequiredItems.Add("FreezeGland", 2);
-		potion.RequiredItems.Add("ElderBark", 4);
-		potion.RequiredItems.Add("Entrails", 8);
-
-		SEValue(potion, (effect, value) => effect.m_ttl = value, flaskOfElementsTTL);
-
-		potion = new Item(assets, "Flask_of_Fortification");
-		potion.Crafting.Add("opalchemy", 2);
-		potion.RequiredItems.Add("Potion_Meadbase", 1);
-		potion.RequiredItems.Add("Obsidian", 2);
-		potion.RequiredItems.Add("Flint", 4);
-		potion.RequiredItems.Add("Stone", 8);
-
-		SEValue(potion, (effect, value) => effect.m_ttl = value, flaskOfFortificationTTL);
-
-		potion = new Item(assets, "Flask_of_the_Gods");
-		potion.Crafting.Add("opalchemy", 2);
-		potion.RequiredItems.Add("Potion_Meadbase", 1);
-		potion.RequiredItems.Add("Thistle", 4);
-		potion.RequiredItems.Add("Flax", 4);
-		potion.RequiredItems.Add("Carrot", 2);
-
-		SEValue(potion, (effect, value) => effect.m_ttl = value, flaskOfGodsTTL);
-		SEValue(potion, (effect, value) => effect.m_healthOverTime = value, flaskOfGodsHealing);
-		SEValue(potion, (effect, value) => effect.m_healthRegenMultiplier = value, flaskOfGodsRegenMultiplier);
-
-		potion = new Item(assets, "Flask_of_Magelight");
-		potion.Crafting.Add("opalchemy", 2);
-		potion.RequiredItems.Add("Potion_Meadbase", 1);
-		potion.RequiredItems.Add("BoneFragments", 4);
-		potion.RequiredItems.Add("FreezeGland", 4);
-		potion.RequiredItems.Add("GreydwarfEye", 8);
-
-		SEValue(potion, (effect, value) => effect.m_ttl = value, flaskOfMagelightTTL);
-		Light Magelight = PrefabManager.RegisterPrefab(assets, "Magelight").GetComponent<Light>();
-		void SetLightIntensity()
-		{
-			Magelight.intensity = flaskOfMagelightIntensity.Value;
-			Magelight.color = flaskOfMagelightColor.Value;
-		}
-		SetLightIntensity();
-		flaskOfMagelightIntensity.SettingChanged += (_, _) => SetLightIntensity();
-		flaskOfMagelightColor.SettingChanged += (_, _) => SetLightIntensity();
-
-		potion = new Item(assets, "Flask_of_Second_Wind");
-		potion.Crafting.Add("opalchemy", 2);
-		potion.RequiredItems.Add("Potion_Meadbase", 1);
-		potion.RequiredItems.Add("Ooze", 4);
-		potion.RequiredItems.Add("FreezeGland", 2);
-		potion.RequiredItems.Add("Feathers", 6);
-
-		SEValue(potion, (effect, value) => effect.m_ttl = value, flaskOfSecondWindTTL);
-		SEValue(potion, (effect, value) => effect.m_jumpStaminaUseModifier = 1 - value, flaskOfSecondWindJumpStaminaFactor);
-		SEValue(potion, (effect, value) => effect.m_runStaminaDrainModifier = 1 - value, flaskOfSecondWindRunStaminaFactor);
-		SEValue(potion, (effect, value) => effect.m_staminaRegenMultiplier = value, flaskOfSecondWindStaminaRegenMultiplier);
-
-		potion = new Item(assets, "Grand_Healing_Tide_Potion");
-		potion.Crafting.Add("opalchemy", 2);
-		potion.RequiredItems.Add("Ooze", 2);
-		potion.RequiredItems.Add("Barley", 4);
-		potion.RequiredItems.Add("Needle", 2);
-		potion.RequiredItems.Add("Cloudberry", 6);
-
-		SEValue(potion, (effect, value) => effect.m_healthOverTime = value, grandHealingTidePotionHealthOverTime);
-		SEValue(potion, (effect, value) => effect.m_healthOverTimeDuration = value, grandHealingTidePotionTTL);
-		SEValue(potion, (effect, value) => effect.m_healthOverTimeInterval = value, grandHealingTidePotionTickInterval);
-
-		potion = new Item(assets, "Grand_Spiritual_Healing_Potion");
-		potion.Crafting.Add("opalchemy", 2);
-		potion.RequiredItems.Add("Ooze", 4);
-		potion.RequiredItems.Add("Flax", 4);
-		potion.RequiredItems.Add("WolfFang", 2);
-		potion.RequiredItems.Add("Cloudberry", 6);
-
-		SEValue(potion, (effect, value) => effect.m_ttl = value, grandSpiritualHealingPotionCooldown);
-		SEValue(potion, (effect, value) => effect.m_healthOverTime = value, grandSpiritualHealingPotionHealthOverTime);
-
-		potion = new Item(assets, "Grand_Stamina_Elixir");
-		potion.Crafting.Add("opalchemy", 2);
-		potion.RequiredItems.Add("LoxMeat", 2);
-		potion.RequiredItems.Add("Carrot", 4);
-		potion.RequiredItems.Add("Turnip", 4);
-		potion.RequiredItems.Add("Cloudberry", 8);
-
-		SEValue(potion, (effect, value) => effect.m_ttl = value, grandStaminaElixirCooldown);
-		SEValue(potion, (effect, value) => effect.m_staminaOverTime = value, grandStaminaElixirStaminaOverTime);
-		SEValue(potion, (effect, value) => effect.m_staminaOverTimeDuration = value, grandStaminaElixirTTL);
-
-		potion = new Item(assets, "Grand_Stealth_Elixir");
-		potion.Crafting.Add("opalchemy", 2);
-		potion.RequiredItems.Add("FreezeGland", 2);
-		potion.RequiredItems.Add("Flax", 4);
-		potion.RequiredItems.Add("Feathers", 2);
-		potion.RequiredItems.Add("Carrot", 2);
-
-		SEValue(potion, (effect, value) => effect.m_ttl = value, grandStealthElixirTTL);
-		SEValue(potion, (effect, value) => effect.m_noiseModifier = -value / 100f, grandStealthElixirNoiseReduction);
-		SEValue(potion, (effect, value) => effect.m_stealthModifier = -value / 100f, grandStealthElixirVisibilityReduction);
-
-		potion = new Item(assets, "Medium_Healing_Tide_Flask");
-		potion.Crafting.Add("opalchemy", 1);
-		potion.RequiredItems.Add("Resin", 6);
-		potion.RequiredItems.Add("Blueberries", 4);
-		potion.RequiredItems.Add("Bloodbag", 2);
-
-		SEValue(potion, (effect, value) => effect.m_ttl = value, mediumHealingTideFlaskCooldown);
-		SEValue(potion, (effect, value) => effect.m_healthOverTime = value, mediumHealingTideFlaskHealthOverTime);
-		SEValue(potion, (effect, value) => effect.m_healthOverTimeDuration = value, mediumHealingTideFlaskTTL);
-		SEValue(potion, (effect, value) => effect.m_healthOverTimeInterval = value, mediumHealingTideFlaskTickInterval);
-
-		potion = new Item(assets, "Medium_Spiritual_Healing_Flask");
-		potion.Crafting.Add("opalchemy", 1);
-		potion.RequiredItems.Add("Ooze", 2);
-		potion.RequiredItems.Add("BoneFragments", 4);
-		potion.RequiredItems.Add("Bloodbag", 2);
-
-		SEValue(potion, (effect, value) => effect.m_ttl = value, mediumSpiritualHealingFlaskCooldown);
-		SEValue(potion, (effect, value) => effect.m_healthOverTime = value, mediumSpiritualHealingFlaskHealthOverTime);
-		((SE_Stats)potion.Prefab.GetComponent<ItemDrop>().m_itemData.m_shared.m_consumeStatusEffect).m_healthOverTimeDuration = 1f;
-
-		potion = new Item(assets, "Medium_Stamina_Flask");
-		potion.Crafting.Add("opalchemy", 1);
-		potion.RequiredItems.Add("Resin", 4);
-		potion.RequiredItems.Add("Blueberries", 4);
-		potion.RequiredItems.Add("Bloodbag", 2);
-
-		SEValue(potion, (effect, value) => effect.m_ttl = value, mediumStaminaFlaskCooldown);
-		SEValue(potion, (effect, value) => effect.m_staminaOverTime = value, mediumStaminaFlaskStaminaOverTime);
-		((SE_Stats)potion.Prefab.GetComponent<ItemDrop>().m_itemData.m_shared.m_consumeStatusEffect).m_staminaOverTimeDuration = 1f;
-
-		potion = new Item(assets, "Lesser_Healing_Tide_Vial");
-		potion.Crafting.Add("opalchemy", 1);
-		potion.RequiredItems.Add("Honey", 2);
-		potion.RequiredItems.Add("Raspberry", 4);
-
-		SEValue(potion, (effect, value) => effect.m_ttl = value, lesserHealingTideVialCooldown);
-		SEValue(potion, (effect, value) => effect.m_healthOverTime = value, lesserHealingTideVialHealthOverTime);
-		SEValue(potion, (effect, value) => effect.m_healthOverTimeDuration = value, lesserHealingTideVialTTL);
-		SEValue(potion, (effect, value) => effect.m_healthOverTimeInterval = value, lesserHealingTideVialTickInterval);
-
-		potion = new Item(assets, "Lesser_Spiritual_Healing_Vial");
-		potion.Crafting.Add("opalchemy", 1);
-		potion.RequiredItems.Add("Dandelion", 2);
-		potion.RequiredItems.Add("Raspberry", 4);
-
-		SEValue(potion, (effect, value) => effect.m_ttl = value, lesserSpiritualHealingVialCooldown);
-		SEValue(potion, (effect, value) => effect.m_healthOverTime = value, lesserSpiritualHealingVialHealthOverTime);
-		((SE_Stats)potion.Prefab.GetComponent<ItemDrop>().m_itemData.m_shared.m_consumeStatusEffect).m_healthOverTimeDuration = 1f;
-
-		potion = new Item(assets, "Lesser_Stamina_Vial");
-		potion.Crafting.Add("opalchemy", 1);
-		potion.RequiredItems.Add("Honey", 2);
-		potion.RequiredItems.Add("Mushroom", 4);
-
-		SEValue(potion, (effect, value) => effect.m_ttl = value, lesserStaminaVialCooldown);
-		SEValue(potion, (effect, value) => effect.m_staminaOverTime = value, lesserStaminaVialStaminaOverTime);
-		((SE_Stats)potion.Prefab.GetComponent<ItemDrop>().m_itemData.m_shared.m_consumeStatusEffect).m_staminaOverTimeDuration = 1f;
-
-		BuildPiece piece = new(assets, "opalchemy");
-		piece.RequiredItems.Add("Stone", 8, true);
-
-		piece = new BuildPiece(assets, "opcauldron");
-		piece.RequiredItems.Add("Iron", 4, true);
-
-		piece = new BuildPiece(assets, "Odins_Alchemy_Book");
-		piece.RequiredItems.Add("WitheredBone", 1, true);
-		piece.RequiredItems.Add("SurtlingCore", 2, true);
-		piece.RequiredItems.Add("Iron", 4, true);
-
-		Item alchemyEquipment = new(assets, "Odins_Alchemy_Wand");
-		alchemyEquipment.Crafting.Add(CraftingTable.Forge, 2);
-		alchemyEquipment.RequiredItems.Add("FineWood", 8);
-		alchemyEquipment.RequiredItems.Add("Copper", 3);
-		alchemyEquipment.RequiredItems.Add("SurtlingCore", 1);
-		alchemyEquipment.RequiredUpgradeItems.Add("FineWood", 4);
-		alchemyEquipment.RequiredUpgradeItems.Add("Copper", 1);
-
-		alchemyEquipment = new Item(assets, "Odins_Wizard_Hat");
-		alchemyEquipment.Crafting.Add(CraftingTable.Workbench, 5);
-		alchemyEquipment.MaximumRequiredStationLevel = 5;
-		alchemyEquipment.RequiredItems.Add("LinenThread", 20);
-		alchemyEquipment.RequiredItems.Add("SurtlingCore", 5);
-		alchemyEquipment.RequiredUpgradeItems.Add("LinenThread", 10);
-		alchemyEquipment.RequiredUpgradeItems.Add("SurtlingCore", 2);
-
-		ItemValue(alchemyEquipment, (item, value) => item.m_armor = value, wizardHatBaseArmor);
-		ItemValue(alchemyEquipment, (item, value) => item.m_armorPerLevel = value, wizardHatArmorPerUpgrade);
-
-		alchemyEquipment = new Item(assets, "Odins_Warlock_Hat");
-		alchemyEquipment.Crafting.Add(CraftingTable.Workbench, 5);
-		alchemyEquipment.MaximumRequiredStationLevel = 5;
-		alchemyEquipment.RequiredItems.Add("LinenThread", 20);
-		alchemyEquipment.RequiredItems.Add("SurtlingCore", 5);
-		alchemyEquipment.RequiredUpgradeItems.Add("LinenThread", 10);
-		alchemyEquipment.RequiredUpgradeItems.Add("SurtlingCore", 2);
-
-		ItemValue(alchemyEquipment, (item, value) => item.m_armor = value, warlockHatBaseArmor);
-		ItemValue(alchemyEquipment, (item, value) => item.m_armorPerLevel = value, warlockHatArmorPerUpgrade);
-		
-		alchemyEquipment = new Item(assets, "Odins_Dragon_Staff");
-		alchemyEquipment.Crafting.Add(CraftingTable.Workbench, 3);
-		alchemyEquipment.MaximumRequiredStationLevel = 5;
-		alchemyEquipment.RequiredItems.Add("Odins_Alchemy_Wand", 1);
-		alchemyEquipment.RequiredItems.Add("ElderBark", 40);
-		alchemyEquipment.RequiredItems.Add("BlackMetal", 40);
-		alchemyEquipment.RequiredItems.Add("SurtlingCore", 1);
-		alchemyEquipment.RequiredUpgradeItems.Add("ElderBark", 20);
-		alchemyEquipment.RequiredUpgradeItems.Add("BlackMetal", 20);
-
-		GameObject smokeScreen = PrefabManager.RegisterPrefab(assets, "Staff_Smoke_Cloud");
-		smokeScreen.AddComponent<SmokescreenOwner>();
-
-		smokeScreen.GetComponent<TimedDestruction>().m_timeout = smokeScreenTTL.Value;
-		smokeScreenTTL.SettingChanged += (_, _) => smokeScreen.GetComponent<TimedDestruction>().m_timeout = smokeScreenTTL.Value;
-
-		potion = new Item(assets, "Odins_Weapon_Oil");
-		potion.Crafting.Add("opalchemy", 1);
-		potion.RequiredItems.Add("Tar", 8);
-		potion.RequiredItems.Add("Crystal", 1);
-
-		SEValue(potion, (effect, value) => effect.m_ttl = value * 60f, weaponOilTTL);
-		ConvertConsumeSEStats<WeaponOil>(potion.Prefab);
-
-		potion = new Item(assets, "Hellbroth_of_Flames");
-		potion.Crafting.Add("opalchemy", 1);
-		potion.RequiredItems.Add("Resin", 8);
-		potion.RequiredItems.Add("Torch", 1);
-
-		Aoe fireAoe = PrefabManager.RegisterPrefab(assets, "Hellbroth_Explosion").GetComponent<Aoe>();
-		fireAoe.m_damage.m_fire = hellbrothOfFlamesDamage.Value;
-		hellbrothOfFlamesDamage.SettingChanged += (_, _) => fireAoe.m_damage.m_fire = hellbrothOfFlamesDamage.Value;
-		PrefabManager.RegisterPrefab(assets, "Hellbroth_Projectile");
-		PrefabManager.RegisterPrefab(assets, "Hellbroth_Orb_Projectile");
-		wandProjectiles.Add("Hellbroth_Orb_Projectile");
-		PrefabManager.RegisterPrefab(assets, "Hellbroth_of_Flames_Charge");
-
-		potion = new Item(assets, "Hellbroth_of_Frost");
-		potion.Crafting.Add("opalchemy", 2);
-		potion.RequiredItems.Add("FreezeGland", 4);
-		potion.RequiredItems.Add("Chain", 1);
-
-		Aoe frostAoe = PrefabManager.RegisterPrefab(assets, "Hellbroth_Frost_Explosion").GetComponent<Aoe>();
-		frostAoe.m_damage.m_frost = hellbrothOfFrostDamage.Value;
-		hellbrothOfFrostDamage.SettingChanged += (_, _) => frostAoe.m_damage.m_frost = hellbrothOfFrostDamage.Value;
-		PrefabManager.RegisterPrefab(assets, "Hellbroth_Frost_Projectile");
-		PrefabManager.RegisterPrefab(assets, "Hellbroth_Frost_Orb_Projectile");
-		wandProjectiles.Add("Hellbroth_Frost_Orb_Projectile");
-		PrefabManager.RegisterPrefab(assets, "Hellbroth_of_Frost_Charge");
-
-		potion = new Item(assets, "Hellbroth_of_Thors_Fury");
-		potion.Crafting.Add("opalchemy", 2);
-		potion.RequiredItems.Add("Tar", 6);
-		potion.RequiredItems.Add("Thunderstone", 1);
-
-		Aoe lightningAoe = PrefabManager.RegisterPrefab(assets, "Hellbroth_Thors_Fury_Explosion").GetComponent<Aoe>();
-		lightningAoe.m_damage.m_lightning = hellbrothOfThorsFuryDamage.Value;
-		hellbrothOfThorsFuryDamage.SettingChanged += (_, _) => lightningAoe.m_damage.m_lightning = hellbrothOfThorsFuryDamage.Value;
-		PrefabManager.RegisterPrefab(assets, "Hellbroth_Thors_Fury_Projectile");
-		PrefabManager.RegisterPrefab(assets, "Hellbroth_of_Thors_Fury_Charge");
-		PrefabManager.RegisterPrefab(assets, "Hellbroth_Thors_Fury_Orb_Projectile");
-		wandProjectiles.Add("Hellbroth_Thors_Fury_Orb_Projectile");
-
-		potion = new Item(assets, "Hellbroth_of_Eternal_Life");
-		potion.Crafting.Add("opalchemy", 2);
-		potion.RequiredItems.Add("Honey", 5);
-		potion.RequiredItems.Add("Dandelion", 3);
-		PrefabManager.RegisterPrefab(assets, "Hellbroth_Life_Projectile");
-		PrefabManager.RegisterPrefab(assets, "Hellbroth_Life_Explostion");
-		PrefabManager.RegisterPrefab(assets, "Hellbroth_Life_Orb_Projectile");
-		wandProjectiles.Add("Hellbroth_Life_Orb_Projectile");
-		PrefabManager.RegisterPrefab(assets, "Hellbroth_of_Eternal_Life_Charge");
-
-		potion = new Item(assets, "Lesser_Group_Healing");
-		if (API.IsLoaded())
-		{
-			potion.Crafting.Add("opalchemy", 1);
-			potion.RequiredItems.Add("Honey", 1);
-			potion.RequiredItems.Add("Mushroom", 2);
-		}
-		SEValue(potion, (effect, value) => effect.m_ttl = value, brewOfFaintGroupHealingCooldown);
-		SEValue(potion, (effect, value) => effect.m_healthOverTime = value, brewOfFaintGroupHealingHealthOverTime);
-		ConvertConsumeSEStats<GroupPotion>(potion.Prefab).m_healthOverTimeDuration = 1f;
-
-		potion = new Item(assets, "Medium_Group_Healing");
-		if (API.IsLoaded())
-		{
-			potion.Crafting.Add("opalchemy", 1);
-			potion.RequiredItems.Add("Honey", 2);
-			potion.RequiredItems.Add("Mushroom", 4);
-		}
-		SEValue(potion, (effect, value) => effect.m_ttl = value, brewOfGroupHealingCooldown);
-		SEValue(potion, (effect, value) => effect.m_healthOverTime = value, brewOfGroupHealingHealthOverTime);
-		ConvertConsumeSEStats<GroupPotion>(potion.Prefab).m_healthOverTimeDuration = 1f;
-
-		potion = new Item(assets, "Grand_Group_Healing");
-		if (API.IsLoaded())
-		{
-			potion.Crafting.Add("opalchemy", 2);
-			potion.RequiredItems.Add("Honey", 4);
-			potion.RequiredItems.Add("Mushroom", 6);
-		}
-		SEValue(potion, (effect, value) => effect.m_ttl = value, brewOfGrandGroupHealingCooldown);
-		SEValue(potion, (effect, value) => effect.m_healthOverTime = value, brewOfGrandGroupHealingHealthOverTime);
-		ConvertConsumeSEStats<GroupPotion>(potion.Prefab).m_healthOverTimeDuration = 1f;
-
-		potion = new Item(assets, "Brew_of_Cunning_Toxicity");
-		if (API.IsLoaded())
-		{
-			potion.Crafting.Add("opalchemy", 2);
-			potion.RequiredItems.Add("Ooze", 10);
-			potion.RequiredItems.Add("Bloodbag", 3);
-			potion.RequiredItems.Add("Dandelion", 4);
-		}
-		ConvertConsumeSEStats<GroupPotion>(potion.Prefab).damageType = HitData.DamageType.Poison;
-		SEValue(potion, (effect, value) => effect.m_ttl = value, brewOfCunningToxicityTTL);
-		SEValue(potion, (effect, value) => ((GroupPotion)effect).range = value, brewOfCunningToxicityRange);
-
-		potion = new Item(assets, "Brew_of_Fiery_Revenge");
-		if (API.IsLoaded())
-		{
-			potion.Crafting.Add("opalchemy", 2);
-			potion.RequiredItems.Add("Resin", 20);
-			potion.RequiredItems.Add("Torch", 3);
-			potion.RequiredItems.Add("SurtlingCore", 2);
-		}
-		ConvertConsumeSEStats<GroupPotion>(potion.Prefab).damageType = HitData.DamageType.Fire;
-		SEValue(potion, (effect, value) => effect.m_ttl = value, brewOfFieryRevengeTTL);
-		SEValue(potion, (effect, value) => ((GroupPotion)effect).range = value, brewOfFieryRevengeRange);
-
-		potion = new Item(assets, "Brew_of_Icy_Touch");
-		if (API.IsLoaded())
-		{
-			potion.Crafting.Add("opalchemy", 2);
-			potion.RequiredItems.Add("FreezeGland", 4);
-			potion.RequiredItems.Add("Carrot", 5);
-			potion.RequiredItems.Add("Turnip", 5);
-		}
-		ConvertConsumeSEStats<GroupPotion>(potion.Prefab).damageType = HitData.DamageType.Frost;
-		SEValue(potion, (effect, value) => effect.m_ttl = value, brewOfIcyTouchTTL);
-		SEValue(potion, (effect, value) => ((GroupPotion)effect).range = value, brewOfIcyTouchRange);
-
-		potion = new Item(assets, "Brew_of_Spiritual_Death");
-		if (API.IsLoaded())
-		{
-			potion.Crafting.Add("opalchemy", 2);
-			potion.RequiredItems.Add("Chitin", 2);
-			potion.RequiredItems.Add("Entrails", 4);
-		}
-		ConvertConsumeSEStats<GroupPotion>(potion.Prefab).damageType = HitData.DamageType.Spirit;
-		SEValue(potion, (effect, value) => effect.m_ttl = value, brewOfSpiritualDeathTTL);
-		SEValue(potion, (effect, value) => ((GroupPotion)effect).range = value, brewOfSpiritualDeathRange);
-
-		potion = new Item(assets, "Brew_of_Thunderous_Words");
-		if (API.IsLoaded())
-		{
-			potion.Crafting.Add("opalchemy", 2);
-			potion.RequiredItems.Add("Obsidian", 3);
-			potion.RequiredItems.Add("GreydwarfEye", 6);
-			potion.RequiredItems.Add("Cloudberry", 2);
-		}
-		ConvertConsumeSEStats<GroupPotion>(potion.Prefab).damageType = HitData.DamageType.Lightning;
-		SEValue(potion, (effect, value) => effect.m_ttl = value, brewOfThunderousWordsTTL);
-		SEValue(potion, (effect, value) => ((GroupPotion)effect).range = value, brewOfThunderousWordsRange);
-
-		potion = new Item(assets, "Lesser_Mana_Potion");
-		if (MO_API.IsLoaded())
-		{
-			potion.Crafting.Add("opalchemy", 1);
-			potion.RequiredItems.Add("Thistle", 1);
-			potion.RequiredItems.Add("GreydwarfEye", 1);
-			potion.RequiredItems.Add("Dandelion", 1);
-		}
-		ConvertConsumeSEStats<ManaPotion>(potion.Prefab);
-		SEValue(potion, (effect, value) => effect.m_ttl = value, weakManaPotionCooldown);
-		SEValue(potion, (effect, value) => ((ManaPotion)effect).manaToRestore = value, weakManaPotionManaRestoration);
-		
-		potion = new Item(assets, "Large_Mana_Potion");
-		if (MO_API.IsLoaded())
-		{
-			potion.Crafting.Add("opalchemy", 2);
-			potion.RequiredItems.Add("Thistle", 3);
-			potion.RequiredItems.Add("GreydwarfEye", 3);
-			potion.RequiredItems.Add("Dandelion", 3);
-		}
-		ConvertConsumeSEStats<ManaPotion>(potion.Prefab);
-		SEValue(potion, (effect, value) => effect.m_ttl = value, giantManaPotionCooldown);
-		SEValue(potion, (effect, value) => ((ManaPotion)effect).manaToRestore = value, giantManaPotionManaRestoration);
-		
-		potion = new Item(assets, "Grand_Mana_Potion");
-		if (MO_API.IsLoaded())
-		{
-			potion.Crafting.Add("opalchemy", 2);
-			potion.RequiredItems.Add("Thistle", 4);
-			potion.RequiredItems.Add("GreydwarfEye", 4);
-			potion.RequiredItems.Add("Dandelion", 4);
-		}
-		ConvertConsumeSEStats<ManaPotion>(potion.Prefab).manaToRestore = 99999999;
-		SEValue(potion, (effect, value) => effect.m_ttl = value, overflowingManaPotionCooldown);
-		
 		void AddStatusEffectModifier(Item item)
 		{
 			SE_Stats statusEffect = (SE_Stats)item.Prefab.GetComponent<ItemDrop>().m_itemData.m_shared.m_equipStatusEffect;
@@ -820,6 +378,14 @@ public class PotionsPlus : BaseUnityPlugin
 
 		CheatDeathStatusEffect = assets.LoadAsset<SE_Stats>("CheatDeath");
 		AlchemySkillProcStatusEffect = assets.LoadAsset<SE_Stats>("AlcSkillProc");
+
+		PrefabManager.RegisterPrefab(assets, "PP_sfx_rebirth");
+		PrefabManager.RegisterPrefab(assets, "PP_sfx_stoneuse");
+		PrefabManager.RegisterPrefab(assets, "PP_sfx_brewpotiondone");
+		PrefabManager.RegisterPrefab(assets, "PP_sfx_potion_smash");
+		PrefabManager.RegisterPrefab(assets, "PP_sfx_brewpotion");
+		PrefabManager.RegisterPrefab(assets, "PP_vfx_potionhit");
+		PrefabManager.RegisterPrefab(assets, "sfx_build_alchemy");
 	}
 
 	private static SE_Stats CheatDeathStatusEffect = null!;
@@ -1092,7 +658,7 @@ public class PotionsPlus : BaseUnityPlugin
 		}
 	}
 
-	private class SmokescreenOwner : MonoBehaviour, IProjectile
+	public class SmokescreenOwner : MonoBehaviour, IProjectile
 	{
 		public void Setup(Character owner, Vector3 velocity, float hitNoise, HitData hitData, ItemDrop.ItemData item)
 		{
@@ -1162,12 +728,12 @@ public class PotionsPlus : BaseUnityPlugin
 				Random.State state = Random.state;
 				bool blockIt = Random.value < (smokeScreenChanceToBlock.Value + (smokescreenZDO.GetBool("PotionsPlus SmokeCloud HatBonus") ? warlockHatSmokeScreenBlockIncrease.Value : 0)) / 100f;
 				Random.state = state;
-				
+
 				return blockIt;
 			}
 			return true;
 		}
-		
+
 		[HarmonyPriority(Priority.Low)]
 		private static void Postfix(Projectile __instance, Collider collider, bool __state)
 		{
@@ -1177,7 +743,7 @@ public class PotionsPlus : BaseUnityPlugin
 			}
 		}
 	}
-	
+
 	[HarmonyPatch(typeof(Projectile), nameof(Projectile.SpawnOnHit))]
 	private class TransferDamageToAoeProjectile
 	{
@@ -1188,7 +754,7 @@ public class PotionsPlus : BaseUnityPlugin
 			{
 				Aoe aoe = (Aoe)newProjectile;
 				Projectile projectile = (Projectile)spawning;
-				
+
 				aoe.m_damage.Add(projectile.m_damage);
 				aoe.m_attackForce += projectile.m_attackForce;
 				aoe.m_backstabBonus += projectile.m_backstabBonus;
@@ -1199,7 +765,7 @@ public class PotionsPlus : BaseUnityPlugin
 
 		private static IEnumerable<CodeInstruction> Transpiler(IEnumerable<CodeInstruction> instructions)
 		{
-			MethodInfo projectile = AccessTools.DeclaredMethod(typeof(GameObject), nameof(GameObject.GetComponent), Array.Empty<Type>(), new []{ typeof(IProjectile) });
+			MethodInfo projectile = AccessTools.DeclaredMethod(typeof(GameObject), nameof(GameObject.GetComponent), Array.Empty<Type>(), new[] { typeof(IProjectile) });
 			foreach (CodeInstruction instruction in instructions)
 			{
 				yield return instruction;
