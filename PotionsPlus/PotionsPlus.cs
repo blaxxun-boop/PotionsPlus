@@ -21,7 +21,7 @@ namespace PotionsPlus;
 public class PotionsPlus : BaseUnityPlugin
 {
 	private const string ModName = "PotionsPlus";
-	private const string ModVersion = "4.1.2";
+	private const string ModVersion = "4.1.6";
 	private const string ModGUID = "com.odinplus.potionsplus";
 
 	private static readonly ConfigSync configSync = new(ModName) { DisplayName = ModName, CurrentVersion = ModVersion, MinimumRequiredVersion = ModVersion };
@@ -29,7 +29,7 @@ public class PotionsPlus : BaseUnityPlugin
 	public static readonly HashSet<string> wandProjectiles = new();
 
 	private static ConfigEntry<Toggle> serverConfigLocked = null!;
-	private static ConfigEntry<float> philosophersStoneXpGainFactor = null!;
+	public static ConfigEntry<float> philosophersStoneXpGainFactor = null!;
 	private static ConfigEntry<Toggle> alchemySkillEnabled = null!;
 	private static ConfigEntry<Toggle> alchemySkillBonusWhenCraftingEnabled = null!;
 	// Flask of Elements
@@ -312,6 +312,7 @@ public class PotionsPlus : BaseUnityPlugin
 		GroupPotionSetup.initializeGroupPotions(assets);
 		ManaPotionSetup.initializeManaPotions(assets);
 		HellbrothSetup.initializeHellbroth(assets);
+		PhilosophersSetup.initializePhilosophersStones(assets);
 
 		Localizer.AddPlaceholder("pp_flask_elements_description", "duration", flaskOfElementsTTL, ttl => (ttl / 60f).ToString("0.#"));
 		Localizer.AddPlaceholder("pp_flask_secondwind_description", "duration", flaskOfSecondWindTTL, ttl => (ttl / 60f).ToString("0.#"));
@@ -361,20 +362,6 @@ public class PotionsPlus : BaseUnityPlugin
 		Assembly assembly = Assembly.GetExecutingAssembly();
 		Harmony harmony = new(ModGUID);
 		harmony.PatchAll(assembly);
-
-		void AddStatusEffectModifier(Item item)
-		{
-			SE_Stats statusEffect = (SE_Stats)item.Prefab.GetComponent<ItemDrop>().m_itemData.m_shared.m_equipStatusEffect;
-			statusEffect.m_raiseSkill = Skill.fromName("Alchemy");
-			statusEffect.m_raiseSkillModifier = philosophersStoneXpGainFactor.Value;
-			philosophersStoneXpGainFactor.SettingChanged += (_, _) => statusEffect.m_raiseSkillModifier = philosophersStoneXpGainFactor.Value;
-		}
-
-		AddStatusEffectModifier(new Item(assets, "PhilosopherStoneBlue"));
-		AddStatusEffectModifier(new Item(assets, "PhilosopherStoneGreen"));
-		AddStatusEffectModifier(new Item(assets, "PhilosopherStoneRed"));
-		AddStatusEffectModifier(new Item(assets, "PhilosopherStonePurple"));
-		AddStatusEffectModifier(new Item(assets, "PhilosopherStoneBlack"));
 
 		CheatDeathStatusEffect = assets.LoadAsset<SE_Stats>("CheatDeath");
 		AlchemySkillProcStatusEffect = assets.LoadAsset<SE_Stats>("AlcSkillProc");
@@ -571,7 +558,7 @@ public class PotionsPlus : BaseUnityPlugin
 	{
 		private static bool Prefix(Collider collider, Vector3 hitPoint, Aoe __instance, ref bool __result)
 		{
-			if (!__instance.name.StartsWith("Hellbroth_Life_Explostion", StringComparison.Ordinal))
+			if (!__instance.name.StartsWith("Hellbroth_Life_Explosion", StringComparison.Ordinal))
 			{
 				return true;
 			}
