@@ -153,6 +153,7 @@
         <Compile Include="WeaponOil.cs"/>
     </ItemGroup>
     <ItemGroup>
+        <EmbeddedResource Include="translations\French.yml"/>
         <EmbeddedResource Include="translations\English.json"/>
         <EmbeddedResource Include="translations\German.json"/>
         <EmbeddedResource Include="translations\Russian.json"/>

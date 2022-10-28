@@ -21,7 +21,7 @@ namespace PotionsPlus;
 public class PotionsPlus : BaseUnityPlugin
 {
 	private const string ModName = "PotionsPlus";
-	private const string ModVersion = "4.1.6";
+	private const string ModVersion = "4.1.7";
 	private const string ModGUID = "com.odinplus.potionsplus";
 
 	private static readonly ConfigSync configSync = new(ModName) { DisplayName = ModName, CurrentVersion = ModVersion, MinimumRequiredVersion = ModVersion };
@@ -128,14 +128,10 @@ public class PotionsPlus : BaseUnityPlugin
 	public static ConfigEntry<int> brewOfThunderousWordsRange = null!;
 	// Odins Wizard Hat
 	private static ConfigEntry<float> wizardHatConsumeChargeReduction = null!;
-	public static ConfigEntry<int> wizardHatBaseArmor = null!;
-	public static ConfigEntry<int> wizardHatArmorPerUpgrade = null!;
 	// Odins Warlock Hat
 	private static ConfigEntry<float> warlockHatSmokeScreenSizeIncrease = null!;
 	private static ConfigEntry<int> warlockHatSmokeScreenBlockIncrease = null!;
 	private static ConfigEntry<int> warlockHatSmokeScreenDurationIncrease = null!;
-	public static ConfigEntry<int> warlockHatBaseArmor = null!;
-	public static ConfigEntry<int> warlockHatArmorPerUpgrade = null!;
 	// Odins Weapon Oil
 	public static ConfigEntry<int> weaponOilDamageIncrease = null!;
 	public static ConfigEntry<float> weaponOilTTL = null!;
@@ -283,14 +279,10 @@ public class PotionsPlus : BaseUnityPlugin
 		brewOfThunderousWordsRange = config("Brew of Thunderous Words", "Effect Range", 30, new ConfigDescription("Range of the Brew of Thunderous Words effect.", new AcceptableValueRange<int>(3, 200)));
 		// Odins Wizard Hat
 		wizardHatConsumeChargeReduction = config("Odins Wizard Hat", "Charge Consumption Reduction", 40f, new ConfigDescription("Chance to not consume a Hellbroth charge, when using the Alchemy Wand or Dragon Staff while wearing the Wizard hat.", new AcceptableValueRange<float>(0f, 100f)));
-		wizardHatBaseArmor = config("Odins Wizard Hat", "Base Armor", 20, new ConfigDescription("Base armor for the Wizard Hat."));
-		wizardHatArmorPerUpgrade = config("Odins Wizard Hat", "Armor Per Level", 2, new ConfigDescription("Armor increase for each upgrade for the Wizard Hat."));
 		// Odins Warlock Hat
 		warlockHatSmokeScreenSizeIncrease = config("Odins Warlock Hat", "Smoke Screen Size Increase", 2f, new ConfigDescription("Radius increase for the smoke screen ability of the Dragon Staff while wearing the Warlock hat.", new AcceptableValueRange<float>(0f, 5f)));
 		warlockHatSmokeScreenDurationIncrease = config("Odins Warlock Hat", "Smoke Screen Duration Increase", 2, new ConfigDescription("Duration increase for the smoke screen ability of the Dragon Staff while wearing the Warlock hat in seconds.", new AcceptableValueRange<int>(0, 15)));
 		warlockHatSmokeScreenBlockIncrease = config("Odins Warlock Hat", "Smoke Screen Block Chance Increase", 25, new ConfigDescription("Projectile block chance increase for the smoke screen ability of the Dragon Staff while wearing the Warlock hat.", new AcceptableValueRange<int>(0, 100)));
-		warlockHatBaseArmor = config("Odins Warlock Hat", "Base Armor", 20, new ConfigDescription("Base armor for the Warlock Hat."));
-		warlockHatArmorPerUpgrade = config("Odins Warlock Hat", "Armor Per Level", 2, new ConfigDescription("Armor increase for each upgrade for the Warlock Hat."));
 		// Odins Dragon Staff
 		smokeScreenChanceToBlock = config("Odins Dragon Staff", "Block Chance", 50, new ConfigDescription("Chance to block projectiles for the smoke screen effect of Odins Dragon Staff.", new AcceptableValueRange<int>(0, 100)));
 		smokeScreenTTL = config("Odins Dragon Staff", "Effect Duration", 8f, new ConfigDescription("Effect duration for the smoke screen effect of Odins Dragon Staff in seconds.", new AcceptableValueRange<float>(1f, 30f)));

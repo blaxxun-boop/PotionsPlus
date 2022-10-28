@@ -23,9 +23,6 @@ public static class EquipmentSetup
 		alchemyEquipment.RequiredUpgradeItems.Add("LinenThread", 10);
 		alchemyEquipment.RequiredUpgradeItems.Add("SurtlingCore", 2);
 
-		Utils.ItemValue(alchemyEquipment, (item, value) => item.m_armor = value, PotionsPlus.wizardHatBaseArmor);
-		Utils.ItemValue(alchemyEquipment, (item, value) => item.m_armorPerLevel = value, PotionsPlus.wizardHatArmorPerUpgrade);
-
 		alchemyEquipment = new Item(assets, "Odins_Warlock_Hat");
 		alchemyEquipment.Crafting.Add(CraftingTable.Workbench, 5);
 		alchemyEquipment.MaximumRequiredStationLevel = 5;
@@ -33,9 +30,6 @@ public static class EquipmentSetup
 		alchemyEquipment.RequiredItems.Add("SurtlingCore", 5);
 		alchemyEquipment.RequiredUpgradeItems.Add("LinenThread", 10);
 		alchemyEquipment.RequiredUpgradeItems.Add("SurtlingCore", 2);
-
-		Utils.ItemValue(alchemyEquipment, (item, value) => item.m_armor = value, PotionsPlus.warlockHatBaseArmor);
-		Utils.ItemValue(alchemyEquipment, (item, value) => item.m_armorPerLevel = value, PotionsPlus.warlockHatArmorPerUpgrade);
 
 		alchemyEquipment = new Item(assets, "Odins_Dragon_Staff");
 		alchemyEquipment.Crafting.Add(CraftingTable.Workbench, 3);
