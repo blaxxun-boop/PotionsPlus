@@ -21,7 +21,7 @@ namespace PotionsPlus;
 public class PotionsPlus : BaseUnityPlugin
 {
 	private const string ModName = "PotionsPlus";
-	private const string ModVersion = "4.1.7";
+	private const string ModVersion = "4.1.9";
 	private const string ModGUID = "com.odinplus.potionsplus";
 
 	private static readonly ConfigSync configSync = new(ModName) { DisplayName = ModName, CurrentVersion = ModVersion, MinimumRequiredVersion = ModVersion };
@@ -172,7 +172,6 @@ public class PotionsPlus : BaseUnityPlugin
 		Localizer.Load();
 
 		AssetBundle assets = PrefabManager.RegisterAssetBundle("potions");
-
 		alchemy = new Skill("Alchemy", assets.LoadAsset<Sprite>("AlcSkill"));
 		alchemy.Name.Alias("pp_potion_skill_name");
 		alchemy.Description.Alias("pp_potion_skill_description");
@@ -365,6 +364,11 @@ public class PotionsPlus : BaseUnityPlugin
 		PrefabManager.RegisterPrefab(assets, "PP_sfx_brewpotion");
 		PrefabManager.RegisterPrefab(assets, "PP_vfx_potionhit");
 		PrefabManager.RegisterPrefab(assets, "sfx_build_alchemy");
+		PrefabManager.RegisterPrefab(assets, "VFX_RedPotionDrink");
+		PrefabManager.RegisterPrefab(assets, "VFX_GreenPotionDrink");
+		PrefabManager.RegisterPrefab(assets, "VFX_BluePotionDrink");
+		PrefabManager.RegisterPrefab(assets, "VFX_PurplePotionDrink");
+		PrefabManager.RegisterPrefab(assets, "potionaudio");
 	}
 
 	private static SE_Stats CheatDeathStatusEffect = null!;
@@ -639,7 +643,7 @@ public class PotionsPlus : BaseUnityPlugin
 
 	public class SmokescreenOwner : MonoBehaviour, IProjectile
 	{
-		public void Setup(Character owner, Vector3 velocity, float hitNoise, HitData hitData, ItemDrop.ItemData item)
+		public void Setup(Character owner, Vector3 velocity, float hitNoise, HitData hitData, ItemDrop.ItemData item, ItemDrop.ItemData ammo)
 		{
 			ZDO zdo = GetComponent<ZNetView>().m_zdo;
 			zdo.Set("PotionsPlus SmokeCloud Owner", owner.GetZDOID());
@@ -696,8 +700,7 @@ public class PotionsPlus : BaseUnityPlugin
 		{
 			if (collider && collider.gameObject.layer == LayerMask.NameToLayer("blocker") && collider.transform.parent?.GetComponent<ZNetView>()?.m_zdo is { } smokescreenZDO)
 			{
-				bool hitCharacter = false;
-				if (ZNetScene.instance.FindInstance(smokescreenZDO.GetZDOID("PotionsPlus SmokeCloud Owner"))?.GetComponent<Character>() is { } smokescreenOwner && !__instance.IsValidTarget(smokescreenOwner, ref hitCharacter))
+				if (ZNetScene.instance.FindInstance(smokescreenZDO.GetZDOID("PotionsPlus SmokeCloud Owner"))?.GetComponent<Character>() is { } smokescreenOwner && !__instance.IsValidTarget(smokescreenOwner))
 				{
 					return false;
 				}

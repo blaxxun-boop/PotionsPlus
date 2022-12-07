@@ -7,7 +7,7 @@ public static class PotionsSetup
 {
 	public static void initializePotions(AssetBundle assets)
 	{
-		Item potion = new Item(assets, "Flask_of_Elements");
+		Item potion = new(assets, "Flask_of_Elements");
 		potion.Crafting.Add("opalchemy", 1);
 		potion.RequiredItems.Add("Potion_Meadbase", 1);
 		potion.RequiredItems.Add("FreezeGland", 2);
