@@ -135,15 +135,12 @@
     <ItemGroup>
         <Compile Include="FlaskEffects.cs" />
         <Compile Include="GroupPotion.cs" />
-        <Compile Include="ManaPotion.cs" />
-        <Compile Include="MO_API.cs" />
         <Compile Include="PotionsPlus.cs" />
         <Compile Include="Properties\AssemblyInfo.cs" />
         <Compile Include="Setup\BuildingPiecesSetup.cs" />
         <Compile Include="Setup\EquipmentSetup.cs" />
         <Compile Include="Setup\GroupPotionSetup.cs" />
         <Compile Include="Setup\HellbrothSetup.cs" />
-        <Compile Include="Setup\ManaPotionSetup.cs" />
         <Compile Include="Setup\PhilosophersSetup.cs" />
         <Compile Include="Setup\PotionsSetup.cs" />
         <Compile Include="Utils.cs" />

@@ -17,11 +17,12 @@ namespace PotionsPlus;
 
 [BepInPlugin(ModGUID, ModName, ModVersion)]
 [BepInDependency("org.bepinex.plugins.groups", BepInDependency.DependencyFlags.SoftDependency)]
-[BepInDependency("MagicOverhaul", BepInDependency.DependencyFlags.SoftDependency)]
+[BepInIncompatibility("org.bepinex.plugins.valheim_plus")]
+[BepInDependency("org.bepinex.plugins.devmod", BepInDependency.DependencyFlags.SoftDependency)]
 public class PotionsPlus : BaseUnityPlugin
 {
 	private const string ModName = "PotionsPlus";
-	private const string ModVersion = "4.1.9";
+	private const string ModVersion = "4.1.11";
 	private const string ModGUID = "com.odinplus.potionsplus";
 
 	private static readonly ConfigSync configSync = new(ModName) { DisplayName = ModName, CurrentVersion = ModVersion, MinimumRequiredVersion = ModVersion };
@@ -138,14 +139,6 @@ public class PotionsPlus : BaseUnityPlugin
 	// Odins Dragon Staff
 	private static ConfigEntry<int> smokeScreenChanceToBlock = null!;
 	public static ConfigEntry<float> smokeScreenTTL = null!;
-	// Weak Mana Potion
-	public static ConfigEntry<int> weakManaPotionManaRestoration = null!;
-	public static ConfigEntry<int> weakManaPotionCooldown = null!;
-	// Giant Mana Potion
-	public static ConfigEntry<int> giantManaPotionManaRestoration = null!;
-	public static ConfigEntry<int> giantManaPotionCooldown = null!;
-	// Overflowing Mana Potion
-	public static ConfigEntry<int> overflowingManaPotionCooldown = null!;
 
 	private ConfigEntry<T> config<T>(string group, string name, T value, ConfigDescription description, bool synchronizedSetting = true)
 	{
@@ -162,7 +155,7 @@ public class PotionsPlus : BaseUnityPlugin
 	private enum Toggle
 	{
 		On = 1,
-		Off = 0
+		Off = 0,
 	}
 
 	private static Skill alchemy = null!;
@@ -288,20 +281,11 @@ public class PotionsPlus : BaseUnityPlugin
 		// Odins Weapon Oil
 		weaponOilDamageIncrease = config("Odins Weapon Oil", "Damage Increase", 5, new ConfigDescription("Damage increase for weapons from the Odins Weapon Oil effect.", new AcceptableValueRange<int>(0, 100)));
 		weaponOilTTL = config("Odins Weapon Oil", "Effect Duration", 30f, new ConfigDescription("Effect duration for Odins Weapon Oil in minutes.", new AcceptableValueRange<float>(1f, 120f)));
-		// Weak Mana Potion
-		weakManaPotionManaRestoration = config("Weak Mana Potion", "Mana Restoration", 15, new ConfigDescription("Mana restoration from the Weak Mana Potion effect."));
-		weakManaPotionCooldown = config("Weak Mana Potion", "Cooldown Duration", 120, new ConfigDescription("Cooldown of the Weak Mana Potion in seconds.", new AcceptableValueRange<int>(5, 900)));
-		// Giant Mana Potion
-		giantManaPotionManaRestoration = config("Giant Mana Potion", "Mana Restoration", 75, new ConfigDescription("Mana restoration from the Giant Mana Potion effect."));
-		giantManaPotionCooldown = config("Giant Mana Potion", "Cooldown Duration", 180, new ConfigDescription("Cooldown of the Giant Mana Potion in seconds.", new AcceptableValueRange<int>(5, 900)));
-		// Overflowing Mana Potion
-		overflowingManaPotionCooldown = config("Overflowing Mana Potion", "Cooldown Duration", 300, new ConfigDescription("Cooldown of the Overflowing Mana Potion in seconds.", new AcceptableValueRange<int>(5, 900)));
 
 		BuildingPiecesSetup.initializeBuildingPieces(assets);
 		PotionsSetup.initializePotions(assets);
 		EquipmentSetup.initializeEquipment(assets);
 		GroupPotionSetup.initializeGroupPotions(assets);
-		ManaPotionSetup.initializeManaPotions(assets);
 		HellbrothSetup.initializeHellbroth(assets);
 		PhilosophersSetup.initializePhilosophersStones(assets);
 
@@ -347,8 +331,6 @@ public class PotionsPlus : BaseUnityPlugin
 		Localizer.AddPlaceholder("pp_odins_warlock_hat_description", "power", warlockHatSmokeScreenBlockIncrease);
 		Localizer.AddPlaceholder("pp_odins_warlock_hat_description", "radius", warlockHatSmokeScreenSizeIncrease);
 		Localizer.AddPlaceholder("pp_odins_warlock_hat_description", "duration", warlockHatSmokeScreenDurationIncrease);
-		Localizer.AddPlaceholder("pp_lesser_mana_potion_description", "power", weakManaPotionManaRestoration);
-		Localizer.AddPlaceholder("pp_large_mana_potion_description", "power", giantManaPotionManaRestoration);
 
 		Assembly assembly = Assembly.GetExecutingAssembly();
 		Harmony harmony = new(ModGUID);
@@ -368,6 +350,9 @@ public class PotionsPlus : BaseUnityPlugin
 		PrefabManager.RegisterPrefab(assets, "VFX_GreenPotionDrink");
 		PrefabManager.RegisterPrefab(assets, "VFX_BluePotionDrink");
 		PrefabManager.RegisterPrefab(assets, "VFX_PurplePotionDrink");
+		PrefabManager.RegisterPrefab(assets, "VFX_StonePurple");
+		PrefabManager.RegisterPrefab(assets, "VFX_StoneBlue");
+		PrefabManager.RegisterPrefab(assets, "VFX_StoneGreen");
 		PrefabManager.RegisterPrefab(assets, "potionaudio");
 	}
 
@@ -387,7 +372,7 @@ public class PotionsPlus : BaseUnityPlugin
 			Player.m_localPlayer.GetSEMan().RemoveStatusEffect(philosopherStoneStatusEffect);
 
 			Inventory inventory = Player.m_localPlayer.GetInventory();
-			if (inventory.GetAllItems().FirstOrDefault(i => i.m_equiped && i.m_shared.m_itemType == ItemDrop.ItemData.ItemType.Utility && i.m_shared.m_equipStatusEffect.m_category == "pp_philstone") is { } equippedPhilosopherStone)
+			if (inventory.GetAllItems().FirstOrDefault(i => i.m_equipped && i.m_shared.m_itemType == ItemDrop.ItemData.ItemType.Utility && i.m_shared.m_equipStatusEffect.m_category == "pp_philstone") is { } equippedPhilosopherStone)
 			{
 				inventory.RemoveOneItem(equippedPhilosopherStone);
 				CheatDeathStatusEffect.m_ttl = 6f;
@@ -415,7 +400,7 @@ public class PotionsPlus : BaseUnityPlugin
 	private static void onGroupPotionActivated(long sender, string effect)
 	{
 		GroupPotion.effectApplied = true;
-		Player.m_localPlayer.GetSEMan().AddStatusEffect(ObjectDB.instance.GetStatusEffect(effect));
+		Player.m_localPlayer.GetSEMan().AddStatusEffect(ObjectDB.instance.GetStatusEffect(effect.GetStableHashCode()));
 		GroupPotion.effectApplied = false;
 	}
 
@@ -426,7 +411,7 @@ public class PotionsPlus : BaseUnityPlugin
 
 		private static void Postfix(Incinerator __instance)
 		{
-			ZRoutedRpc.instance.InvokeRoutedRPC(__instance.m_nview.GetZDO().m_owner, "PotionsPlus Alchemy Level", Mathf.RoundToInt(Player.m_localPlayer.GetSkillFactor("Alchemy") * 100));
+			ZRoutedRpc.instance.InvokeRoutedRPC(__instance.m_nview.GetZDO().GetOwner(), "PotionsPlus Alchemy Level", Mathf.RoundToInt(Player.m_localPlayer.GetSkillFactor("Alchemy") * 100));
 		}
 	}
 
@@ -447,7 +432,7 @@ public class PotionsPlus : BaseUnityPlugin
 
 		private static IEnumerable<CodeInstruction> Transpiler(IEnumerable<CodeInstruction> instructions)
 		{
-			Type Incinerate = TargetMethod().DeclaringType;
+			Type Incinerate = TargetMethod().DeclaringType!;
 
 			MethodInfo invoke = AccessTools.DeclaredMethod(typeof(MonoBehaviour), nameof(Invoke));
 			foreach (CodeInstruction instruction in instructions)
@@ -533,13 +518,13 @@ public class PotionsPlus : BaseUnityPlugin
 	[HarmonyPatch(typeof(InventoryGui), nameof(InventoryGui.DoCrafting))]
 	private static class ApplyAlchemySkillOnAlchemyTableCrafting
 	{
-		private static void Prefix(out int __state) => __state = Game.instance.GetPlayerProfile().m_playerStats.m_crafts;
+		private static void Prefix(out int __state) => __state = (int)Game.instance.GetPlayerProfile().m_playerStats[PlayerStatType.Crafts];
 
 		private static void Postfix(InventoryGui __instance, Player player, int __state)
 		{
-			if (Game.instance.GetPlayerProfile().m_playerStats.m_crafts > __state && Player.m_localPlayer.GetCurrentCraftingStation()?.name.StartsWith("opalchemy") == true && __instance.m_craftUpgradeItem is null)
+			if ((int)Game.instance.GetPlayerProfile().m_playerStats[PlayerStatType.Crafts] > __state && Player.m_localPlayer.GetCurrentCraftingStation()?.name.StartsWith("opalchemy") == true && __instance.m_craftUpgradeItem is null)
 			{
-				for (int i = DetermineExtraItems(Mathf.RoundToInt(player.GetSkillFactor("Alchemy") * 100), ZDOMan.instance.GetMyID()); i > 0; --i)
+				for (int i = DetermineExtraItems(Mathf.RoundToInt(player.GetSkillFactor("Alchemy") * 100), ZDOMan.instance.m_sessionID); i > 0; --i)
 				{
 					int quality = __instance.m_craftUpgradeItem != null ? __instance.m_craftUpgradeItem.m_quality + 1 : 1;
 					player.GetInventory().AddItem(__instance.m_craftRecipe.m_item.gameObject.name, __instance.m_craftRecipe.m_amount, quality, __instance.m_craftVariant, player.GetPlayerID(), player.GetPlayerName());
@@ -585,7 +570,7 @@ public class PotionsPlus : BaseUnityPlugin
 	{
 		private static bool Prefix(RandomSpeak __instance)
 		{
-			return __instance.gameObject.layer != Piece.ghostLayer;
+			return __instance.gameObject.layer != Piece.s_ghostLayer;
 		}
 	}
 
@@ -681,7 +666,7 @@ public class PotionsPlus : BaseUnityPlugin
 
 		private static IEnumerable<CodeInstruction> Transpiler(IEnumerable<CodeInstruction> instructions)
 		{
-			FieldInfo maskField = AccessTools.DeclaredField(typeof(Projectile), nameof(Projectile.m_rayMaskSolids));
+			FieldInfo maskField = AccessTools.DeclaredField(typeof(Projectile), nameof(Projectile.s_rayMaskSolids));
 			foreach (CodeInstruction instruction in instructions)
 			{
 				yield return instruction;
@@ -706,7 +691,7 @@ public class PotionsPlus : BaseUnityPlugin
 				}
 
 				__state = true;
-				Random.InitState((int)__instance.m_nview.m_zdo.m_uid.m_id);
+				Random.InitState((int)__instance.m_nview.m_zdo.m_uid.ID);
 				Random.State state = Random.state;
 				bool blockIt = Random.value < (smokeScreenChanceToBlock.Value + (smokescreenZDO.GetBool("PotionsPlus SmokeCloud HatBonus") ? warlockHatSmokeScreenBlockIncrease.Value : 0)) / 100f;
 				Random.state = state;
@@ -719,7 +704,7 @@ public class PotionsPlus : BaseUnityPlugin
 		[HarmonyPriority(Priority.Low)]
 		private static void Postfix(Projectile __instance, Collider collider, bool __state)
 		{
-			if (__state && __instance.m_didHit && __instance.m_stayAfterHitStatic)
+			if (__state && __instance is { m_didHit: true, m_stayAfterHitStatic: true })
 			{
 				ZNetScene.instance.Destroy(__instance.gameObject);
 			}

@@ -17,7 +17,7 @@ public class GroupPotion : SE_Stats
 		{
 			foreach (PlayerReference groupPlayer in API.GroupPlayers().Where(p => p != PlayerReference.fromPlayer(Player.m_localPlayer)))
 			{
-				Vector3 groupPlayerPos = ZNet.m_instance.m_players.FirstOrDefault(p => p.m_characterID.m_userID == groupPlayer.peerId).m_position;
+				Vector3 groupPlayerPos = ZNet.m_instance.m_players.FirstOrDefault(p => p.m_characterID.UserID == groupPlayer.peerId).m_position;
 				if (range == 0 || global::Utils.DistanceXZ(character.transform.position, groupPlayerPos) < range)
 				{
 					ZRoutedRpc.instance.InvokeRoutedRPC(groupPlayer.peerId, "PotionsPlus Potion Activated", name);
@@ -32,7 +32,7 @@ public class GroupPotion : SE_Stats
 		{
 			return;
 		}
-		
+
 		float chopDamage = hitData.m_damage.m_chop;
 		float pickaxeDamage = hitData.m_damage.m_pickaxe;
 		float totalDamage = hitData.GetTotalDamage() - pickaxeDamage - chopDamage;
