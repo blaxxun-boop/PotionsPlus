@@ -71,7 +71,7 @@
             <SpecificVersion>false</SpecificVersion>
         </Reference>
         <Reference Include="Groups">
-            <HintPath>$(GamePath)\BepInEx\plugins\Groups.dll</HintPath>
+          <HintPath>Libs\GroupsAPI.dll</HintPath>
         </Reference>
         <Reference Include="ItemManager">
             <HintPath>Libs\ItemManager.dll</HintPath>
